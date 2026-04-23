@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<title>Brigade Compass</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0D2137;--navy2:#1a3460;--navy3:#0a1a2e;
+  --gold:#C89B2A;--gold2:#E8B84B;
+  --green:#1B7A4A;--green-bg:#E8F6EE;
+  --blue:#1756A0;--blue-bg:#E8F0FB;
+  --bg:#F0F2F5;--white:#FFFFFF;
+  --text:#0D1B2A;--muted:#6B7280;--border:#E5E7EB;
+  --orange:#D4600A;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* SPLASH */
+.splash{position:fixed;inset:0;background:var(--navy3);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity 0.6s ease}
+.splash.hide{opacity:0;pointer-events:none}
+.splash img{height:68px;width:auto}
+.splash h1{font-size:28px;font-weight:700;color:#fff}.splash h1 span{color:var(--gold2)}
+.splash p{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1.5px;text-transform:uppercase}
+.splash-bar{width:160px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-top:8px}
+.splash-bar div{height:100%;background:var(--gold2);animation:sLoad 2.1s ease forwards}
+@keyframes sLoad{from{width:0}to{width:100%}}
+
+/* TOPBAR */
+.topbar{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:600}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:42px;width:auto}
+.brand-div{width:1px;height:30px;background:rgba(255,255,255,0.15)}
+.brand-text h1{font-size:18px;font-weight:700;color:#fff}.brand-text h1 span{color:var(--gold2)}
+.brand-text p{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.6px;text-transform:uppercase}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.ts-wrap{display:none;align-items:center;gap:0;border-right:1px solid rgba(255,255,255,0.1);padding-right:12px;margin-right:6px}
+.ts{display:flex;flex-direction:column;align-items:center;padding:0 10px;line-height:1}
+.ts strong{font-size:14px;font-weight:700;color:#fff}
+.ts span{font-size:8px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.4px;margin-top:1px}
+.ts-div{width:1px;height:20px;background:rgba(255,255,255,0.1)}
+.live-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#22C55E;padding:2px 8px;background:rgba(34,197,94,0.1);border-radius:20px;border:1px solid rgba(34,197,94,0.25);margin-left:6px}
+.live-dot{width:5px;height:5px;background:#22C55E;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.notif-btn{position:relative;background:transparent;border:1.5px solid rgba(255,255,255,0.18);border-radius:7px;padding:7px 12px;cursor:pointer;color:rgba(255,255,255,0.7);transition:all 0.2s;display:flex;align-items:center}
+.notif-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+.notif-btn:active{transform:scale(0.94)}
+.notif-btn svg{width:20px;height:20px}
+.notif-badge{position:absolute;top:-6px;right:-6px;background:#E24B4A;color:#fff;font-size:9px;font-weight:700;min-width:17px;height:17px;border-radius:9px;display:none;align-items:center;justify-content:center;border:2px solid var(--navy)}
+.notif-badge.on{display:flex;animation:nPulse 2s infinite}
+@keyframes nPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+
+/* TICKER */
+.ticker{background:var(--navy3);border-bottom:1px solid rgba(200,155,42,0.2);height:36px;display:flex;align-items:center;position:sticky;top:64px;z-index:599;overflow:hidden}
+.ticker-lbl{background:var(--gold);color:var(--navy3);font-size:10px;font-weight:700;padding:0 14px;height:36px;display:flex;align-items:center;white-space:nowrap;letter-spacing:0.8px;text-transform:uppercase;flex-shrink:0}
+.ticker-track{flex:1;overflow:hidden;height:36px;display:flex;align-items:center}
+.ticker-inner{display:inline-flex;align-items:center;white-space:nowrap;animation:tick 55s linear infinite;height:36px}
+.ticker-inner:hover{animation-play-state:paused}
+.t-item{display:inline-flex;align-items:center;gap:0;padding:0 24px;font-size:11.5px;color:rgba(255,255,255,0.82);height:36px}
+.t-item strong{color:var(--gold2);font-weight:600}
+.t-dot{display:none}
+.t-sep{display:inline-block;width:1px;height:12px;background:rgba(232,184,75,0.35);margin:0 2px;flex-shrink:0}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* FILTER */
+.filter-panel{background:var(--white);border-bottom:1px solid var(--border);padding:10px 24px 12px;position:sticky;top:100px;z-index:598;box-shadow:0 6px 20px rgba(13,33,55,0.07)}
+.filter-panel::after{content:'';position:absolute;bottom:-36px;left:0;right:0;height:36px;background:linear-gradient(to bottom,rgba(240,242,245,0.95) 0%,rgba(240,242,245,0) 100%);pointer-events:none;z-index:2}
+.fg{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 12px;border-radius:20px;font-size:11.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);user-select:none;font-family:'Poppins',sans-serif;white-space:nowrap;line-height:1}
+.chip:hover{border-color:var(--navy);color:var(--navy)}
+.chip:active{transform:scale(0.92)}
+.chip.sel-loc{background:var(--blue-bg);color:var(--blue);border-color:var(--blue);font-weight:600}
+/* City-tile-matching selected states (override sel-loc when data-city is set) */
+.chip.sel-loc[data-city="blr"]{background:#EEF2F7;color:#0D2137;border-color:#0D2137}
+.chip.sel-loc[data-city="hyd"]{background:#FFF8E6;color:#7A5C00;border-color:#B88A1C}
+.chip.sel-loc[data-city="chn"]{background:#E8F0FB;color:#0F2D5A;border-color:#1756A0}
+.chip.sel-loc[data-city="mys"]{background:#FBF1E0;color:#6B4800;border-color:#A57418}
+.chip.sel-budget{background:#FFF1E6;color:var(--orange);border-color:var(--orange);font-weight:600}
+.chip.sel-status{background:var(--green-bg);color:var(--green);border-color:var(--green);font-weight:600}
+.chip.sel-bhk{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:600}
+.filter-row2{display:flex;align-items:center;gap:8px;margin-top:8px}
+.filter-btn{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:11.5px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.filter-btn:hover{background:var(--navy2)}
+.filter-btn:active{transform:scale(0.94)}
+.f-count{background:var(--gold);color:var(--navy3);border-radius:10px;padding:1px 6px;font-size:10px;font-weight:700;margin-left:2px;display:none}
+.clear-btn{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.clear-btn:hover{border-color:var(--navy);color:var(--navy)}
+.clear-btn:active{transform:scale(0.94)}
+
+/* RESULT */
+.result-info{padding:14px 24px 4px;font-size:11.5px;color:var(--muted)}
+.result-info strong{color:var(--text)}
+
+/* GRID */
+.proj-grid{padding:8px 24px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
+
+/* CARDS */
+.proj-card{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;
+  background:rgba(255,255,255,0.88);
+  backdrop-filter:blur(20px) saturate(160%);
+  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  border:0.5px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 8px rgba(13,33,55,0.07),0 1px 3px rgba(13,33,55,0.04);
+  transition:transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.38s cubic-bezier(0.25,0.46,0.45,0.94)}
+.proj-card::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0) 50%);pointer-events:none;z-index:1;border-radius:12px}
+.proj-card:hover{transform:translateY(-3px) scale(1.006);box-shadow:0 10px 30px rgba(13,33,55,0.12),0 3px 10px rgba(13,33,55,0.07)}
+.proj-card:active{transform:translateY(-1px) scale(1.001);transition-duration:0.1s}
+/* City headers */
+.city-blr .c-head{background:linear-gradient(145deg,#0A1628 0%,#0D2137 50%,#162E52 100%)}
+.city-hyd .c-head{background:linear-gradient(145deg,#1A1400 0%,#2D2400 50%,#5C4A00 100%)}
+.city-chn .c-head{background:linear-gradient(145deg,#0D1F3C 0%,#0F2D5A 50%,#1A4580 100%)}
+.city-mys .c-head{background:linear-gradient(145deg,#1A1200 0%,#332200 50%,#6B4800 100%)}
+.c-head{padding:16px 16px 14px;position:relative;z-index:2;min-height:80px}
+.c-head::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(232,184,75,0.7),transparent)}
+.c-name{font-size:16px;font-weight:700;color:#fff;line-height:1.3;padding-right:86px;margin-bottom:4px;word-break:break-word}
+.c-loc{font-size:12.5px;color:rgba(255,255,255,0.6);margin-top:3px}
+.c-status{position:absolute;top:14px;right:12px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.s-rtm{background:rgba(34,197,94,0.22);color:#22C55E;border:1px solid rgba(34,197,94,0.35)}
+.s-uc{background:rgba(200,155,42,0.22);color:var(--gold2);border:1px solid rgba(200,155,42,0.35)}
+.c-body{padding:12px 14px 10px;position:relative;z-index:2}
+.c-stats{display:grid;grid-template-columns:1fr 1fr 1fr;background:rgba(248,249,251,0.85);border-radius:10px;overflow:hidden;border:1px solid rgba(229,231,235,0.7)}
+.csc{padding:9px 10px;border-right:1px solid rgba(229,231,235,0.6);border-bottom:1px solid rgba(229,231,235,0.6)}
+.csc:nth-child(3),.csc:nth-child(6){border-right:none}
+.csc:nth-child(4),.csc:nth-child(5),.csc:nth-child(6){border-bottom:none}
+.csc-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted)}
+.csc-v{font-size:14px;font-weight:700;color:var(--navy);line-height:1.2;margin-top:2px}
+.c-footer{padding:10px 14px;background:rgba(249,250,251,0.7);border-top:1px solid rgba(229,231,235,0.5);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+.c-rera{font-size:9px;font-family:monospace;color:#B0B8C8}
+.c-view{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;transition:all 0.25s cubic-bezier(0.34,1.56,0.64,1)}
+.c-view:active{transform:scale(0.94)}
+.proj-card:hover .c-view{background:var(--gold);color:var(--navy3)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(8,18,34,0.6);z-index:900;overflow-y:auto;padding:20px 16px;backdrop-filter:blur(3px)}
+.modal-overlay.on{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:860px;margin:auto;overflow:hidden;box-shadow:0 24px 64px rgba(13,33,55,0.22);animation:mUp 0.22s ease}
+@keyframes mUp{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.m-head{background:var(--navy);padding:18px 22px 14px}
+.m-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.m-head h2{font-size:18px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:3px}
+.m-sub{font-size:11px;color:rgba(255,255,255,0.5)}
+.m-badges{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.m-price{font-size:20px;font-weight:700;color:var(--gold2)}
+.m-close{background:rgba(255,255,255,0.12);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;font-family:'Poppins',sans-serif}
+.m-close:hover{background:rgba(255,255,255,0.25)}
+.m-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.wa-btn{display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:22px;padding:7px 12px 7px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:background 0.2s ease,transform 0.15s ease;white-space:nowrap;box-shadow:0 1px 3px rgba(37,211,102,0.35)}
+.wa-btn:hover{background:#1DA851}
+.wa-btn:active{transform:scale(0.96)}
+.wa-btn svg{width:15px;height:15px;flex-shrink:0;fill:currentColor}
+.wa-btn.disabled{background:#9CA3AF;cursor:not-allowed;box-shadow:none}
+.wa-btn.disabled:hover{background:#9CA3AF}
+@media(max-width:640px){
+  .wa-btn{padding:6px 10px 6px 8px;font-size:11px}
+  .wa-btn span.wa-label{display:none}
+}
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--navy);color:#fff;padding:10px 18px;border-radius:22px;font-size:12.5px;font-weight:500;box-shadow:0 6px 20px rgba(13,33,55,0.25);opacity:0;pointer-events:none;transition:opacity 0.25s ease,transform 0.25s ease;z-index:2000;font-family:'Poppins',sans-serif;max-width:85vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+.m-tabs{background:var(--navy2);display:flex;padding:0 22px;overflow-x:auto;scrollbar-width:none;position:relative}
+.m-tabs::-webkit-scrollbar{display:none}
+.tab-btn{background:transparent;border:none;color:rgba(255,255,255,0.55);padding:12px 16px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:'Poppins',sans-serif;border-bottom:2px solid transparent;transition:color 0.28s cubic-bezier(0.25,0.46,0.45,0.94),background 0.28s cubic-bezier(0.25,0.46,0.45,0.94),border-color 0.28s cubic-bezier(0.25,0.46,0.45,0.94);white-space:nowrap;position:relative}
+.tab-btn:hover{color:rgba(255,255,255,0.95);background:rgba(255,255,255,0.04)}
+.tab-btn.active{color:var(--gold2);border-bottom-color:var(--gold2)}
+.tab-btn:active{transform:scale(0.96)}
+.tab-panel{display:none;padding:22px;min-height:400px;overflow-y:auto;animation:tabIn 0.26s cubic-bezier(0.25,0.46,0.45,0.94)}
+.tab-panel.active{display:block}
+@keyframes tabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.unit-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.unit-tbl th{background:#F3F4F6;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.unit-tbl td{padding:10px 12px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+.unit-tbl tr:last-child td{border-bottom:none}
+.u-label{font-weight:600;color:var(--navy)}
+.u-price{font-weight:700;color:var(--navy);font-size:14px}
+.script-box{background:var(--navy3);border-radius:10px;padding:20px 22px;border-left:4px solid var(--gold);margin-bottom:14px}
+.script-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--gold);margin-bottom:10px}
+.script-txt{font-size:14px;color:rgba(255,255,255,0.88);line-height:1.9}
+.script-bullets{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1)}
+.script-bullet{display:flex;gap:10px;margin-bottom:8px;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6}
+.script-bullet-dot{color:var(--gold);font-weight:700;flex-shrink:0}
+.script-close-line{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.1);font-size:13px;color:rgba(255,255,255,0.85);font-style:italic}
+.script-hint{font-size:11px;color:var(--muted);padding:10px 14px;background:#F8F9FB;border-radius:6px;border-left:3px solid var(--border)}
+.usp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.usp-card{background:var(--bg);border-radius:9px;padding:14px;border:1px solid var(--border);border-left:3px solid var(--gold)}
+.usp-h{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:6px}
+.usp-b{font-size:12.5px;color:var(--text);line-height:1.6}
+.link-panel{border-radius:9px;border:1px solid var(--border);background:#EDF1F7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:240px;padding:32px;text-align:center}
+.lp-icon{font-size:38px;line-height:1}
+.lp-title{font-size:15px;font-weight:600;color:var(--navy)}
+.lp-sub{font-size:12px;color:var(--muted);max-width:340px;line-height:1.6}
+.lp-btn{display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:#fff;padding:11px 22px;border-radius:7px;text-decoration:none;font-size:13px;font-weight:500;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.lp-btn:hover{background:var(--navy2)}
+.lp-na{font-size:12px;color:#aaa;font-style:italic}
+.intel-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.intel-card{background:var(--bg);border-radius:9px;padding:14px;border:1px solid var(--border)}
+.intel-card.full{grid-column:1/-1}
+.intel-card.gold-l{border-left:3px solid var(--gold)}
+.intel-card.green-l{border-left:3px solid var(--green)}
+.intel-card.blue-l{border-left:3px solid var(--blue)}
+.intel-h{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:6px}
+.intel-v{font-size:17px;font-weight:700;color:var(--navy);line-height:1.2}
+.intel-sub{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.5}
+.intel-body{font-size:12px;color:var(--text);line-height:1.7}
+.intel-tag{display:inline-block;font-size:10px;font-weight:500;padding:3px 8px;border-radius:4px;margin:2px 3px 2px 0}
+.it-d{background:#E8F6EE;color:#1B7A4A}
+.it-r{background:#FEE2E2;color:#991B1B}
+.it-b{background:#E8F0FB;color:#1756A0}
+.remarks-ta{width:100%;min-height:140px;border:1.5px solid var(--border);border-radius:7px;padding:12px;font-size:13px;font-family:'Poppins',sans-serif;color:var(--text);resize:vertical;outline:none;line-height:1.6}
+.remarks-ta:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(13,33,55,0.08)}
+.save-btn{margin-top:8px;background:var(--navy);color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.save-btn:active{transform:scale(0.96)}
+/* NOTIF */
+.notif-overlay{display:none;position:fixed;inset:0;z-index:800}
+.notif-overlay.on{display:block}
+.notif-panel{position:fixed;top:70px;right:16px;width:360px;max-width:calc(100vw - 28px);background:var(--white);border-radius:13px;box-shadow:0 10px 36px rgba(13,33,55,0.18);border:1px solid var(--border);z-index:850;animation:mUp 0.2s ease;max-height:500px;display:flex;flex-direction:column}
+.notif-header{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.notif-header h3{font-size:14px;font-weight:600;color:var(--navy)}
+.notif-list{overflow-y:auto;flex:1}
+.notif-item{padding:12px 16px;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background 0.15s;position:relative}
+.notif-item:hover{background:#F8F9FB}
+.notif-item.unread{background:#F0F7FF}
+.notif-item.unread::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);border-radius:3px 0 0 3px}
+.notif-type-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.4px}
+.nt-launch{background:#FEE2E2;color:#991B1B}
+.nt-price{background:#E8F6EE;color:#1B7A4A}
+.nt-general{background:#F3F4F6;color:#4B5563}
+.notif-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px;line-height:1.3}
+.notif-msg{font-size:12px;color:var(--muted);line-height:1.5}
+.notif-date{font-size:10px;color:#B0B8C8;margin-top:4px}
+.notif-footer{padding:9px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);text-align:center;flex-shrink:0}
+/* DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(8,18,34,0.45);z-index:700;backdrop-filter:blur(3px)}
+.drawer-overlay.on{display:block}
+.drawer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;z-index:701;padding-bottom:20px;transform:translateY(100%);transition:transform 0.38s cubic-bezier(0.32,0.72,0,1);max-height:80vh;overflow-y:auto;box-shadow:0 -8px 32px rgba(13,33,55,0.18)}
+.drawer.on{transform:translateY(0)}
+.drawer-handle{width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:12px auto 0}
+.drawer-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px}
+.drawer-hdr h3{font-size:16px;font-weight:700;color:var(--navy);font-family:'Poppins',sans-serif}
+.drawer-clr{font-size:12px;color:var(--blue);cursor:pointer;font-weight:500;font-family:'Poppins',sans-serif}
+.drawer-sec{padding:10px 20px 14px;border-bottom:1px solid var(--border)}
+.drawer-sec:last-of-type{border-bottom:none}
+.drawer-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:9px;font-family:'Poppins',sans-serif}
+.drawer-chips{display:flex;flex-wrap:wrap;gap:8px}
+.drawer-apply{position:sticky;bottom:0;background:#fff;padding:12px 20px;border-top:1px solid var(--border)}
+.drawer-apply-btn{width:100%;background:var(--navy);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.drawer-apply-btn:hover{background:var(--navy2)}
+.drawer-apply-btn:active{transform:scale(0.98)}
+/* PIN */
+.pin-ov{display:none;position:fixed;inset:0;background:rgba(8,18,34,0.72);z-index:1000;align-items:center;justify-content:center}
+.pin-ov.on{display:flex}
+.pin-box{background:#fff;border-radius:13px;padding:30px 26px;width:310px;max-width:92vw;box-shadow:0 24px 64px rgba(13,33,55,0.25)}
+.pin-box h2{font-size:17px;font-weight:600;margin-bottom:5px;color:var(--navy);font-family:'Poppins',sans-serif}
+.pin-box p{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6;font-family:'Poppins',sans-serif}
+.pin-err{color:#B91C1C;font-size:11px;font-weight:500;margin-bottom:8px;display:none;font-family:'Poppins',sans-serif}
+.pin-box input{width:100%;border:1.5px solid var(--border);border-radius:7px;padding:11px 12px;font-size:18px;letter-spacing:6px;font-family:'Poppins',sans-serif;margin-bottom:10px;outline:none;text-align:center}
+.pin-box input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(13,33,55,0.1)}
+.pin-btns{display:flex;gap:8px}
+.btn-pri{flex:1;background:var(--navy);color:#fff;border:none;border-radius:7px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+.btn-sec{background:var(--bg);color:var(--muted);border:1.5px solid var(--border);border-radius:7px;padding:10px 14px;font-size:13px;cursor:pointer;font-family:'Poppins',sans-serif;transition:all 0.2s}
+/* ADMIN BAR */
+.admin-bar{display:none;background:var(--green);padding:8px 24px;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:64px;z-index:605}
+.admin-bar.on{display:flex}
+.admin-bar span{font-size:12px;font-weight:500;color:#fff;font-family:'Poppins',sans-serif}
+.sheet-btn{background:#fff;color:var(--green);border:none;border-radius:5px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;font-family:'Poppins',sans-serif}
+.logout-lnk{margin-left:auto;font-size:11px;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;font-family:'Poppins',sans-serif}
+/* MOBILE */
+@media(max-width:640px){
+  .topbar{padding:0 14px;height:58px}
+  .brand img{height:34px}
+  .brand-div{display:none}
+  .brand-text h1{font-size:15px}
+  .brand-text p{display:none}
+  .ts-wrap{display:none !important}
+  .notif-btn svg{width:18px;height:18px}
+  .filter-panel{padding:8px 12px 10px;top:58px}
+  .filter-panel .fg{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:2px}
+  .filter-panel .fg::-webkit-scrollbar{display:none}
+  .filter-panel .fg .chip{flex-shrink:0}
+  .filter-row2{margin-top:8px;display:flex;gap:8px;width:100%}
+  .filter-btn,.clear-btn{flex:1;justify-content:center;border-radius:10px;padding:8px 12px;font-size:12px}
+  .proj-grid{grid-template-columns:1fr;gap:12px;padding-left:12px;padding-right:12px}
+  .result-info{padding-left:12px;padding-right:12px}
+  .modal-overlay{padding:0}
+  .modal{border-radius:0;max-width:100%}
+  .intel-grid{grid-template-columns:1fr}
+  .usp-grid{grid-template-columns:1fr}
+  .m-tabs{padding:0 10px}
+  .tab-btn{padding:9px 10px;font-size:10.5px}
+  .ticker{top:58px}
+}
+
+@media(max-width:640px){
+  .ticker{top:58px !important}
+  .filter-panel{top:94px !important}
+}
+
+.grp-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:5px}
+.grp-purpose{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sub-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 14px 36px 14px;cursor:pointer;transition:transform 0.2s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.2s,border-color 0.2s;position:relative;overflow:hidden}
+.sub-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--gold))}
+.sub-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(13,33,55,0.10);border-color:rgba(13,33,55,0.25)}
+.sub-card:active{transform:scale(0.97)}
+.sc-icon{font-size:22px;margin-bottom:8px}
+.sc-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.sc-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.sc-arrow{position:absolute;bottom:11px;right:13px;font-size:18px;color:var(--border);transition:color 0.15s,transform 0.15s}
+.sub-card:hover .sc-arrow{color:var(--navy);transform:translateX(2px)}
+.sub-detail{display:none}
+.sub-detail.active{display:block;animation:tabIn 0.22s cubic-bezier(0.25,0.46,0.45,0.94)}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:22px;cursor:pointer;font-size:12px;font-weight:600;color:var(--navy);padding:8px 16px 8px 12px;margin-bottom:18px;font-family:inherit;transition:background 0.2s ease,border-color 0.2s ease,transform 0.15s ease;box-shadow:0 1px 2px rgba(13,33,55,0.04)}
+.back-btn:hover{background:#fff;border-color:var(--navy);color:var(--navy)}
+.back-btn:active{transform:scale(0.96)}
+.back-btn svg{width:14px;height:14px;flex-shrink:0}
+.back-btn kbd{display:inline-block;font-size:9px;padding:1px 5px;background:#fff;border:1px solid var(--border);border-radius:3px;font-family:'Poppins',sans-serif;color:var(--muted);margin-left:4px;font-weight:500}
+@media(max-width:640px){.sub-grid{grid-template-columns:1fr}.back-btn kbd{display:none}}
+</style>
+</head>
+<body>
+
+<img id="logoData" src="data:image/png;base64,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" style="display:none" alt="">
+<div class="splash" id="splash">
+  <img src="" alt="Brigade">
+  <h1>Brigade <span>Compass</span></h1>
+  <p>Project Intelligence Platform</p>
+  <div class="splash-bar"><div></div></div>
+</div>
+
+<div class="topbar">
+  <div class="brand">
+    <img src="" alt="Brigade">
+    <div class="brand-div"></div>
+    <div class="brand-text"><h1>Brigade <span>Compass</span></h1><p>Project Intelligence Platform</p></div>
+  </div>
+  <div class="topbar-right">
+    <div class="ts-wrap" id="topbarStats">
+      <div class="ts"><strong id="s-proj">0</strong><span>Projects</span></div>
+      <div class="ts-div"></div>
+      <div class="ts"><strong id="s-rtm">0</strong><span>RTMI</span></div>
+      <div class="ts-div"></div>
+      <div class="ts"><strong id="s-uc">0</strong><span>UC</span></div>
+      <div class="ts-div"></div>
+      <div class="live-badge"><span class="live-dot"></span>Live</div>
+    </div>
+    <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span class="notif-badge" id="notifBadge"></span>
+    </button>
+  </div>
+</div>
+
+<div class="admin-bar" id="adminBar">
+  <span>✅ Admin Mode</span>
+  <a class="sheet-btn" href="https://docs.google.com/spreadsheets/d/1CsxaX5DpKlrjGjTvsEA3s0M9DKsS5CBIdhslsMkyscs/edit" target="_blank">📊 Google Sheet</a>
+  <span class="logout-lnk" onclick="logoutAdmin()">Logout</span>
+</div>
+
+<div class="ticker" id="tickerWrap">
+  <div class="ticker-lbl">🔴 LIVE</div>
+  <div class="ticker-track"><div class="ticker-inner" id="tickerInner"></div></div>
+</div>
+
+<div class="filter-panel" id="filterPanel">
+  <div class="fg">
+    <span class="chip sel-loc" data-g="loc" data-v="all" onclick="pickChip(this,'loc')">All</span>
+    <span class="chip" data-g="loc" data-v="blr" data-city="blr" onclick="pickChip(this,'loc')">Bengaluru</span>
+    <span class="chip" data-g="loc" data-v="north" data-city="blr" onclick="pickChip(this,'loc')">North BLR</span>
+    <span class="chip" data-g="loc" data-v="south" data-city="blr" onclick="pickChip(this,'loc')">South BLR</span>
+    <span class="chip" data-g="loc" data-v="east" data-city="blr" onclick="pickChip(this,'loc')">East BLR</span>
+    <span class="chip" data-g="loc" data-v="west" data-city="blr" onclick="pickChip(this,'loc')">West BLR</span>
+    <span class="chip" data-g="loc" data-v="Hyderabad" data-city="hyd" onclick="pickChip(this,'loc')">Hyderabad</span>
+    <span class="chip" data-g="loc" data-v="Chennai" data-city="chn" onclick="pickChip(this,'loc')">Chennai</span>
+    <span class="chip" data-g="loc" data-v="Mysore" data-city="mys" onclick="pickChip(this,'loc')">Mysore</span>
+  </div>
+  <div class="filter-row2">
+    <button class="filter-btn" onclick="openDrawer()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+      Filters <span class="f-count" id="filterCount">0</span>
+    </button>
+    <button class="clear-btn" onclick="clearAll()">
+      <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Clear
+    </button>
+  </div>
+</div>
+
+<div class="result-info" id="resultInfo"></div>
+<div class="proj-grid" id="projGrid"></div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-head-row">
+        <div><h2 id="mTitle"></h2><div class="m-sub" id="mSub"></div><div class="m-badges" id="mBadges"></div></div>
+        <div class="m-actions">
+          <button class="wa-btn" id="waBtn" onclick="shareOnWhatsApp()" title="Share on WhatsApp">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.372-.025-.521-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <span class="wa-label">Share</span>
+          </button>
+          <button class="m-close" onclick="closeModalDirect()">✕</button>
+        </div>
+      </div>
+    </div>
+    <div class="m-tabs">
+      <button class="tab-btn active" onclick="switchGroup('product',this)">&#127968; Product</button>
+      <button class="tab-btn" onclick="switchGroup('intel',this)">&#128200; Investment Intel</button>
+      <button class="tab-btn" onclick="switchGroup('technical',this)">&#128295; Technical</button>
+      <button class="tab-btn" onclick="switchGroup('objections',this)">&#127919; Objections</button>
+      <button class="tab-btn" onclick="switchGroup('trust',this)">&#128737; Trust</button>
+      <button class="tab-btn" onclick="switchGroup('remarks',this)">&#128221; Sales Remarks</button>
+    </div>
+    <div>
+      <div class="tab-panel active" id="grp-product"></div>
+      <div class="tab-panel" id="grp-intel"></div>
+      <div class="tab-panel" id="grp-technical"></div>
+      <div class="tab-panel" id="grp-objections"></div>
+      <div class="tab-panel" id="grp-trust"></div>
+      <div class="tab-panel" id="grp-remarks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+<div class="notif-panel" id="notifPanel" style="display:none">
+  <div class="notif-header">
+    <h3>🔔 Notifications <span id="notifUnreadCount" style="font-size:11px;color:var(--muted);font-weight:400"></span></h3>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:11px;color:var(--blue);cursor:pointer;font-weight:500" onclick="markAllRead()">Mark all read</span>
+      <button onclick="closeNotifPanel()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;line-height:1">×</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notifList"><div style="padding:36px 20px;text-align:center;color:var(--muted)">No notifications</div></div>
+  <div class="notif-footer">Managed via Google Sheet → NOTIFICATIONS tab</div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="filterDrawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-hdr"><h3>Filter Projects</h3><span class="drawer-clr" onclick="clearAll();updateFilterCount()">Clear all</span></div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Budget</div>
+    <div class="drawer-chips">
+      <span class="chip" data-g="budget" data-v="" onclick="pickChip(this,'budget')">All</span>
+      <span class="chip" data-g="budget" data-v="lt1" onclick="pickChip(this,'budget')">&lt; 1 Cr</span>
+      <span class="chip" data-g="budget" data-v="lt2" onclick="pickChip(this,'budget')">&lt; 2 Cr</span>
+      <span class="chip" data-g="budget" data-v="lt4" onclick="pickChip(this,'budget')">&lt; 4 Cr</span>
+      <span class="chip" data-g="budget" data-v="4plus" onclick="pickChip(this,'budget')">4 Cr+</span>
+    </div>
+  </div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Status</div>
+    <div class="drawer-chips">
+      <span class="chip" data-g="status" data-v="" onclick="pickChip(this,'status')">All</span>
+      <span class="chip" data-g="status" data-v="Ready to Move" onclick="pickChip(this,'status')">Ready to Move In</span>
+      <span class="chip" data-g="status" data-v="Under Construction" onclick="pickChip(this,'status')">Under Construction</span>
+    </div>
+  </div>
+  <div class="drawer-sec">
+    <div class="drawer-lbl">Configuration</div>
+    <div class="drawer-chips">
+      <span class="chip" data-g="bhk" data-v="" onclick="pickChip(this,'bhk')">All BHK</span>
+      <span class="chip" data-g="bhk" data-v="1" onclick="pickChip(this,'bhk')">1 BHK</span>
+      <span class="chip" data-g="bhk" data-v="2" onclick="pickChip(this,'bhk')">2 BHK</span>
+      <span class="chip" data-g="bhk" data-v="3" onclick="pickChip(this,'bhk')">3 BHK</span>
+      <span class="chip" data-g="bhk" data-v="4" onclick="pickChip(this,'bhk')">4 BHK</span>
+      <span class="chip" data-g="bhk" data-v="5" onclick="pickChip(this,'bhk')">5 BHK</span>
+    </div>
+  </div>
+  <div class="drawer-apply"><button class="drawer-apply-btn" onclick="closeDrawer()">Show Results</button></div>
+</div>
+
+<div class="pin-ov" id="pinOv">
+  <div class="pin-box">
+    <h2>Admin Access</h2>
+    <p>Enter your PIN to unlock admin features.</p>
+    <div class="pin-err" id="pinErr">Incorrect PIN.</div>
+    <input type="password" id="pinInput" placeholder="••••" maxlength="10" onkeydown="if(event.key==='Enter')checkPin()">
+    <div class="pin-btns">
+      <button class="btn-sec" onclick="closePinModal()">Cancel</button>
+      <button class="btn-pri" onclick="checkPin()">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>var TECH_DATA={},QUALITY_DATA={},OBJECTION_DATA={},ESG_DATA={},TITLE_DATA={};
+function parseTechnical(rows){if(!rows||rows.length<2)return{};var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});function idx(k){return h.findIndex(function(v){return v.includes(k);});}var m={};rows.slice(1).filter(function(r){return r[idx('projectid')];}).forEach(function(r){var g=function(k){var i=idx(k);return i>=0?r[i]||'':'';}; m[r[idx('projectid')]]={structure:g('structuretype'),towers:g('nooftowers'),floors:g('totalfloors'),lifts:g('liftspertower'),power_backup:g('powerbackuppct'),power_type:g('powerbackuptype'),water:g('watersource'),stp:g('stpcapacity'),parking_type:g('parkingtype'),parking_ratio:g('parkingratio'),ceiling:g('ceilingheight'),f2f:g('floortoflooor'),clubhouse:g('clubhouse'),amenities_count:g('noofamenities'),smart_home:g('smarthome'),fire:g('firesafety'),security:g('securitysystem'),notes:g('additionalnotes')};});return m;}
+function parseQuality(rows){if(!rows||rows.length<2)return{};var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});function idx(k){return h.findIndex(function(v){return v.includes(k);});}var m={};rows.slice(1).filter(function(r){return r[idx('projectid')];}).forEach(function(r){var g=function(k){var i=idx(k);return i>=0?r[i]||'':'';}; m[r[idx('projectid')]]={living_floor:g('livingflooring'),bed_floor:g('bedroomflooring'),kitchen_floor:g('kitchenflooring'),bath_fittings:g('bathroomfittings'),sanitary:g('sanitarybrand'),kitchen_platform:g('kitchenplatform'),main_door:g('maindoor'),internal_doors:g('internaldoors'),windows:g('windows'),electrical:g('electricalbrand'),paint_int:g('paintbrandinterior'),paint_ext:g('paintbrandexterior'),lift_brand:g('liftbrand'),dg_brand:g('dgbrand'),premium1:g('keypremiumfeature1'),premium2:g('keypremiumfeature2'),grade:g('qualitygrade')};});return m;}
+function parseObjections(rows){if(!rows||rows.length<2)return{};var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});function idx(k){return h.findIndex(function(v){return v.includes(k);});}var m={};rows.slice(1).filter(function(r){return r[idx('projectid')];}).forEach(function(r){var g=function(k){var i=idx(k);return i>=0?r[i]||'':'';}; m[r[idx('projectid')]]={price:g('pricehigh'),location:g('locationfar'),possession:g('possessiondelay'),trust:g('developertrust'),competition:g('betteroptions'),resale:g('resalevalue'),uc:g('underconstruction'),loan:g('loandifficulty'),custom1_q:g('customobjection1'),custom1_a:g('customresponse1'),custom2_q:g('customobjection2'),custom2_a:g('customresponse2')};});return m;}
+function parseESG(rows){if(!rows||rows.length<2)return{};var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});function idx(k){return h.findIndex(function(v){return v.includes(k);});}var m={};rows.slice(1).filter(function(r){return r[idx('projectid')];}).forEach(function(r){var g=function(k){var i=idx(k);return i>=0?r[i]||'':'';}; m[r[idx('projectid')]]={rating:g('greenrating'),rating_level:g('greenratinglevel'),rwh:g('rainwaterharvesting'),rwh_cap:g('rwhcapacity'),solar:g('solarpower'),solar_use:g('solarusage'),ev:g('evcharging'),green_cover:g('greencover'),trees:g('nooftrees'),stp_reuse:g('stptreated'),waste:g('wastesegregation'),glass:g('energyefficientglass'),paint:g('lowvoc'),social:g('socialinitiative'),score:g('esgscore')};});return m;}
+function parseTitleStatus(rows){if(!rows||rows.length<2)return{};var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});function idx(k){return h.findIndex(function(v){return v.includes(k);});}var m={};rows.slice(1).filter(function(r){return r[idx('projectid')];}).forEach(function(r){var g=function(k){var i=idx(k);return i>=0?r[i]||'':'';}; m[r[idx('projectid')]]={status:g('titlestatus'),land_type:g('landtype'),conversion:g('conversionstatus'),encumbrance:g('encumbrancestatus'),litigation:g('litigationstatus'),rera:g('reraregistered'),rera_no:g('reranumber'),approvals:g('approvalsobtained'),pending:g('approvalspending'),bank_approved:g('bankapproved'),banks:g('approvedbanks'),insurance:g('titleinsurance'),issues:g('knownissues'),resolution:g('resolutiontimeline'),review_date:g('lastreview'),notes:g('legalnotes')};});return m;}
+
+
+const ADMIN_PIN='2426';
+const API_URL='https://script.google.com/macros/s/AKfycbyFZRBFfTJd5S_HudGTUEP5ifdNaL2l5h1I6NaWFO7vNa1pcRUbqaOASyzJNboq3U8fHQ/exec';
+const SHEET_URL='https://docs.google.com/spreadsheets/d/1CsxaX5DpKlrjGjTvsEA3s0M9DKsS5CBIdhslsMkyscs/edit';
+let adminActive=false,currentPID=null;
+let PROJECTS=[],UNITS=[],INTEL_DATA={},NOTIFICATIONS_DATA=[];
+let readNotifIds=new Set();
+const F={loc:'all',budget:'',status:'',bhk:''};
+const CITY_ORDER={Bengaluru:0,Hyderabad:1,Chennai:2,Mysore:3};
+
+const SNAPSHOT={"projects":[{"id":"BRG_LAKECREST_BLR","name":"Brigade Lakecrest","city":"Bengaluru","micro":"K R Puram","zone":"Bangalore East","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/446/PR/240625/007866","possession":"Mar'30","acres":"5.37","units":"604","floors":"G+21/22","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Lakecrest+KR+Puram+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/43/77/43770efe-23ca-46d7-b789-ea3cfb060b5a/brigade_lakecrest.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_AVALON_BLR","name":"Brigade Avalon","city":"Bengaluru","micro":"Whitefield","zone":"Bangalore East","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/446/PR/300625/007888","possession":"Mar'30","acres":"4","units":"206","floors":"G+14","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Avalon+Whitefield+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/68/f1/68f12e39-2563-4069-a9ad-930ed27033ee/brigade_avalon__a3_brochure_preview_version.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ORCHARDS_EBONY","name":"Brigade Orchards - Ebony","city":"Bengaluru","micro":"Devanahalli","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1250/303/PR/280225/007530","possession":"Mar'29","acres":"135","units":"232","floors":"G+8","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Orchards+Ebony+Devanahalli+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/b4/c7/b4c70bac-5ebc-478b-81bc-49f7013e6036/ebony_brochure-01_compressed_2.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ETERNIA_BLR","name":"Brigade Eternia","city":"Bengaluru","micro":"Yelahanka","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/309/PR/070325/007559","possession":"Mar'30","acres":"14","units":"1124","floors":"G+14","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Eternia+Yelahanka+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/af/46/af46e8fe-59a4-4eb9-9ac3-6319d424255a/brigade_eternia_brochure_e-brochure_ref.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_CITRINE_BLR","name":"Brigade Citrine","city":"Bengaluru","micro":"Bidarahalli","zone":"Bengaluru East","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1250/304/PR/131224/007287","possession":"Jun'29","acres":"4.3","units":"420","floors":"G+30","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Citrine+Bidarahalli+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/2d/41/2d41b658-d7b6-49b9-98ad-bcb095d3bb24/brigade_citrine.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_VALENCIA_BRILLIO","name":"Brigade Valencia - Brillio","city":"Bengaluru","micro":"Hosur Road","zone":"Bengaluru South","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/308/PR/040924/006986","possession":"Sep'29","acres":"24","units":"779","floors":"G+27","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Valencia+Brillio+Electronic+City+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/e2/e5/e2e549a7-c497-424d-8552-9c76224090c0/brigade_valencia.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_INSIGNIA_BLR","name":"Brigade Insignia","city":"Bengaluru","micro":"Yelahanka","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/309/PR/180524/006894","possession":"Jun'29","acres":"5.88","units":"379","floors":"G+18","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Insignia+Yelahanka+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/07/39/07396403-fb09-44e0-84df-601ecbfb137f/insignia_e-brochure__sep_25.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ORCHARDS_FAIRMONT","name":"Brigade Orchards - Fairmont","city":"Bengaluru","micro":"Devanahalli","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1250/303/PR/231123/006424","possession":"Dec'27","acres":"135","units":"92","floors":"G+8","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Orchards+Fairmont+Devanahalli+Bangalore","brochure_url":"","offers_url":"","admin_remarks":""},{"id":"BRG_LUMINA_BLR","name":"Brigade Lumina","city":"Bengaluru","micro":"Tumkur Road","zone":"Bengaluru West","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1251/309/PR/230326/008545","possession":"Dec'30","acres":"3.97","units":"416","floors":"G+19","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Lumina+Tumkur+Road+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/bd/1f/bd1f5cd8-eab7-4ac9-a45d-5647cd8636fc/3703_brgres_lumina_a4_digital_brochure_-_24_march-compressed.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_BELVEDERE_BLR","name":"Brigade Belvedere Ph1","city":"Bengaluru","micro":"Budigere Cross","zone":"Bangalore East","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1265/347/PR/010825/007969","possession":"Mar'31","acres":"10.75","units":"773","floors":"G+43","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Belvedere+Malur+Road+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/f0/a1/f0a12311-36bf-4c90-97ef-3b987895194b/4101_belvedere_minibrochure_v5_23_03_2026.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ORCHARDS_MAPLE","name":"Brigade Orchards - Maple","city":"Bengaluru","micro":"Devanahalli","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1250/303/PR/040326/008505","possession":"Mar'30","acres":"2.5","units":"151","floors":"G+8","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Orchards+Maple+Devanahalli+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/59/d0/59d0a8f6-30ea-4f62-a915-b36bb93a0adc/lm_main_brochure.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ORCHARDS_LAUREL","name":"Brigade Orchards - Laurel","city":"Bengaluru","micro":"Devanahalli","zone":"Bengaluru North","status":"Under Construction","type":"Apartment","rera":"PRM/KA/RERA/1250/303/PR/040326/008505","possession":"Mar'30","acres":"2.5","units":"160","floors":"G+8","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Orchards+Maple+Devanahalli+Bangalore","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/59/d0/59d0a8f6-30ea-4f62-a915-b36bb93a0adc/lm_main_brochure.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ENCLAVE_HYD","name":"Brigade Enclave","city":"Hyderabad","micro":"Motinagar","zone":"Hyderabad","status":"Under Construction","type":"Apartment","rera":"P02200010409","possession":"Sep'29","acres":"4.4","units":"215","floors":"G+6","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Enclave+Motinagar+Hyderabad","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/5d/14/5d14ecca-4f99-4887-975b-788dd6f00ee5/3913_enclave_brochure_digital_v3.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_GATEWAY_HYD","name":"Brigade Gateway Hyd","city":"Hyderabad","micro":"Neopolis, Kokapet","zone":"Hyderabad","status":"Under Construction","type":"Apartment","rera":"P02400009142","possession":"Nov'29","acres":"9.7","units":"297","floors":"G+57","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Gateway+Kokapet+Hyderabad","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/98/40/9840736e-4b57-47ca-9eb2-12fb6bd33cd6/3904_brg_gateway_tower_b_e-brochure_v1_07112025.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_MANOR_HYD","name":"Brigade Manor","city":"Hyderabad","micro":"Motinagar","zone":"Hyderabad","status":"Under Construction","type":"Apartment","rera":"P02200010602","possession":"Sep'29","acres":"4.79","units":"190","floors":"G+5","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Manor+Motinagar+Hyderabad","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/84/bb/84bb9672-44b6-4992-b98f-71fb720f22b1/4030_manor_minibrochure_v1_digital.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_NEBULA_WTC","name":"Nebula at Brigade Residences, WTC","city":"Chennai","micro":"Perungudi","zone":"Chennai","status":"Ready to Move","type":"Apartment","rera":"TN/01/Building/0174/2019","possession":"","acres":"5","units":"60","floors":"G+11","maps_url":"https://www.google.com/maps/search/?api=1&query=Nebula+Brigade+Residences+WTC+Perungudi+Chennai","brochure_url":"","offers_url":"","admin_remarks":""},{"id":"BRG_ALTIUS_CHN","name":"Brigade Altius","city":"Chennai","micro":"Sholinganallur","zone":"Chennai","status":"Under Construction","type":"Apartment","rera":"TN/29/Building/0020/2025","possession":"Mar'30","acres":"6.5","units":"662","floors":"G+43","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Altius+Sholinganallur+Chennai","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/66/7c/667ce561-7b12-46c2-8160-8c5302c554c2/brigade_altius.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_MORGAN_CHN","name":"Brigade Morgan Heights Ph 1","city":"Chennai","micro":"Medavakkam Road","zone":"Chennai","status":"Under Construction","type":"Apartment","rera":"TN/35/Building/0099/2025","possession":"Jun'30","acres":"14.7","units":"624","floors":"18","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Morgan+Heights+Medavakkam+Chennai","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/b4/3c/b43c63a7-3485-4fa7-ab08-e0bedca1ed53/brigade_morgan_heights.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_ICON_CHN","name":"Brigade Icon","city":"Chennai","micro":"Mount Road","zone":"Chennai","status":"Under Construction","type":"Apartment","rera":"TN/29/Building/0392/2024","possession":"Jul'30","acres":"5","units":"200","floors":"G+38","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Icon+Mount+Road+Chennai","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/0c/9d/0c9dad13-761a-4846-8ac7-feb4f28e2552/brigade_icon.pdf","offers_url":"","admin_remarks":""},{"id":"BRG_STELLARIS_CHN","name":"Brigade Stellaris","city":"Chennai","micro":"Velachery","zone":"Chennai","status":"Under Construction","type":"Apartment","rera":"TNRERA/29/BLG/0052/2026","possession":"Dec'30","acres":"5","units":"284","floors":"G+13","maps_url":"https://www.google.com/maps/search/?api=1&query=Brigade+Stellaris+Velachery+Chennai","brochure_url":"https://d1di04ifehjy6m.cloudfront.net/media/filer_public/86/4c/864c3c3a-64f4-4445-be17-b39bfcda1381/brigade_stellaris_e_brochure.pdf","offers_url":"","admin_remarks":""}],"units":[{"pid":"BRG_NEBULA_WTC","label":"1 BR","br":1,"carpet":"40.4 SQM","sba":"91.4 SQM / 984 SQFT","price_label":"On Request","price_inr":0},{"pid":"BRG_NEBULA_WTC","label":"2 BR","br":2,"carpet":"60.72 SQM","sba":"136.1 SQM / 1465 SQFT","price_label":"On Request","price_inr":0},{"pid":"BRG_LAKECREST_BLR","label":"Studio","br":0,"carpet":"30.58 SQM","sba":"44.81 SQM / 482 SQFT","price_label":"Rs.60 L Onwards","price_inr":6000000.0},{"pid":"BRG_LAKECREST_BLR","label":"1 BR+1T","br":1,"carpet":"46.14 SQM","sba":"72.04 SQM / 775 SQFT","price_label":"Rs.92 L Onwards","price_inr":9200000.0},{"pid":"BRG_LAKECREST_BLR","label":"2 BR+2T","br":2,"carpet":"76.69 SQM","sba":"123.19 SQM / 1326 SQFT","price_label":"Rs.1.52 Cr Onwards","price_inr":15200000.0},{"pid":"BRG_LAKECREST_BLR","label":"2 BR+2T+Study","br":2,"carpet":"95.22 SQM","sba":"148.41 SQM / 1598 SQFT","price_label":"Rs.1.95 Cr Onwards","price_inr":19500000.0},{"pid":"BRG_LAKECREST_BLR","label":"3 BR+3T","br":3,"carpet":"98.41 SQM","sba":"152.32 SQM / 1640 SQFT","price_label":"Rs.1.95 Cr Onwards","price_inr":19500000.0},{"pid":"BRG_LAKECREST_BLR","label":"3 BR+3T+Maid","br":3,"carpet":"130.26 SQM","sba":"200.0 SQM / 2153 SQFT","price_label":"Rs.2.54 Cr Onwards","price_inr":25400000.0},{"pid":"BRG_ENCLAVE_HYD","label":"3 BR+3T","br":3,"carpet":"107.99 SQM","sba":"173.54 SQM / 1868 SQFT","price_label":"Rs.1.86 Cr Onwards","price_inr":18600000.0},{"pid":"BRG_ENCLAVE_HYD","label":"4 BR+4T","br":4,"carpet":"146.38 SQM","sba":"234.95 SQM / 2529 SQFT","price_label":"Rs.2.54 Cr Onwards","price_inr":25400000.0},{"pid":"BRG_AVALON_BLR","label":"3 BR+3T+Study+PR","br":3,"carpet":"144.02 SQM","sba":"256.88 SQM / 2765 SQFT","price_label":"Rs.4.82 Cr Onwards","price_inr":48200000.0},{"pid":"BRG_AVALON_BLR","label":"4 BR+4T+Powder+Maid","br":4,"carpet":"203.14 SQM","sba":"358.77 SQM / 3862 SQFT","price_label":"Rs.6.8 Cr Onwards","price_inr":68000000.0},{"pid":"BRG_ORCHARDS_EBONY","label":"3 BR+3T (98-111)","br":3,"carpet":"97.98\u2013110.66 SQM","sba":"153.96\u2013176.28 SQM / 1657\u20131897 SQFT","price_label":"Rs.1.45 Cr Onwards","price_inr":14500000.0},{"pid":"BRG_ORCHARDS_EBONY","label":"3 BR+3T+H","br":3,"carpet":"121.42 SQM","sba":"187.12 SQM / 2014 SQFT","price_label":"Rs.1.75 Cr Onwards","price_inr":17500000.0},{"pid":"BRG_ORCHARDS_EBONY","label":"4 BR+4T+H","br":4,"carpet":"140.51 SQM","sba":"219.72 SQM / 2365 SQFT","price_label":"Rs.1.98 Cr Onwards","price_inr":19800000.0},{"pid":"BRG_ETERNIA_BLR","label":"1 BR+1T","br":1,"carpet":"41.29\u201347.72 SQM","sba":"65.06\u201375.39 SQM / 700\u2013811 SQFT","price_label":"Rs.98 L Onwards","price_inr":9800000.0},{"pid":"BRG_ETERNIA_BLR","label":"3 BR+3T","br":3,"carpet":"101.24\u2013115.28 SQM","sba":"150.85\u2013180.17 SQM / 1624\u20131939 SQFT","price_label":"Rs.2.17 Cr Onwards","price_inr":21700000.0},{"pid":"BRG_ETERNIA_BLR","label":"3 BR+3T+Study","br":3,"carpet":"125.89 SQM","sba":"196.16 SQM / 2111 SQFT","price_label":"Rs.3.01 Cr Onwards","price_inr":30100000.0},{"pid":"BRG_ETERNIA_BLR","label":"4 BR+4T","br":4,"carpet":"159.57\u2013174.91 SQM","sba":"252.12\u2013271.84 SQM / 2714\u20132926 SQFT","price_label":"Rs.4.05 Cr Onwards","price_inr":40500000.0},{"pid":"BRG_CITRINE_BLR","label":"3 BR+3T","br":3,"carpet":"108.41 SQM","sba":"164.0 SQM / 1765 SQFT","price_label":"Rs.2.07 Cr (All Incl)","price_inr":20700000.0},{"pid":"BRG_CITRINE_BLR","label":"3 BR+3T+Study","br":3,"carpet":"117.9 SQM","sba":"185.8 SQM / 2000 SQFT","price_label":"Rs.2.35 Cr (All Incl)","price_inr":23500000.0},{"pid":"BRG_CITRINE_BLR","label":"4 BR+4T+Maid","br":4,"carpet":"143.1 SQM","sba":"234.9 SQM / 2528 SQFT","price_label":"Rs.5 Cr (All Incl)","price_inr":50000000.0},{"pid":"BRG_GATEWAY_HYD","label":"3 BR+Study","br":3,"carpet":"162.43 SQM","sba":"284.9 SQM / 3067 SQFT","price_label":"Rs.5.9 Cr Onwards","price_inr":59000000.0},{"pid":"BRG_GATEWAY_HYD","label":"4 BR+Maid","br":4,"carpet":"223.28 SQM","sba":"383.06 SQM / 4123 SQFT","price_label":"Rs.6.9 Cr Onwards","price_inr":69000000.0},{"pid":"BRG_GATEWAY_HYD","label":"4 BR G+Maid","br":4,"carpet":"255.38 SQM","sba":"460.11 SQM / 4953 SQFT","price_label":"Rs.9.9 Cr Onwards","price_inr":99000000.0},{"pid":"BRG_GATEWAY_HYD","label":"5 BR+Maid","br":5,"carpet":"313.4 SQM","sba":"538.71 SQM / 5761 SQFT","price_label":"Rs.15 Cr Onwards","price_inr":150000000.0},{"pid":"BRG_VALENCIA_BRILLIO","label":"3 BR+3T+Study","br":3,"carpet":"158.0 SQM","sba":"231.4 SQM / 1701 SQFT","price_label":"Rs.1.30 Cr Onwards","price_inr":13000000.0},{"pid":"BRG_VALENCIA_BRILLIO","label":"4 BR+4T+Maid","br":4,"carpet":"152.17 SQM","sba":"231.4 SQM / 2491 SQFT","price_label":"Rs.2.73 Cr Onwards","price_inr":27300000.0},{"pid":"BRG_INSIGNIA_BLR","label":"3 BR+3T+SR","br":3,"carpet":"131.49 SQM","sba":"199.32 SQM / 2145 SQFT","price_label":"Rs.2.45 Cr Onwards","price_inr":24500000.0},{"pid":"BRG_INSIGNIA_BLR","label":"3 BR+3T+P+ST+SR","br":3,"carpet":"155.79 SQM","sba":"230.5 SQM / 2481 SQFT","price_label":"Rs.4.39 Cr Onwards","price_inr":43900000.0},{"pid":"BRG_INSIGNIA_BLR","label":"4 BR+4T+P+SR","br":4,"carpet":"191.93 SQM","sba":"284.81 SQM / 3066 SQFT","price_label":"Rs.4.39 Cr Onwards","price_inr":43900000.0},{"pid":"BRG_INSIGNIA_BLR","label":"5 BR+5T+F+2P+SR","br":5,"carpet":"246.02 SQM","sba":"384.31 SQM / 4137 SQFT","price_label":"Rs.6.99 Cr Onwards","price_inr":69900000.0},{"pid":"BRG_ORCHARDS_FAIRMONT","label":"3 BR (115-118)","br":3,"carpet":"115.5\u2013117.93 SQM","sba":"177.01\u2013180.24 SQM / 1905\u20131940 SQFT","price_label":"Rs.1.77 Cr Onwards","price_inr":17700000.0},{"pid":"BRG_ORCHARDS_FAIRMONT","label":"4 BR","br":4,"carpet":"134.58 SQM","sba":"203.3 SQM / 2188 SQFT","price_label":"Rs.2.08 Cr Onwards","price_inr":20800000.0},{"pid":"BRG_ALTIUS_CHN","label":"3 BR+2T","br":3,"carpet":"93.87\u201398.58 SQM","sba":"160.35\u2013163.01 SQM / 1726\u20131755 SQFT","price_label":"Rs.1.89 Cr Onwards","price_inr":18900000.0},{"pid":"BRG_ALTIUS_CHN","label":"3 BR+3T","br":3,"carpet":"104.64\u2013114.64 SQM","sba":"172.5\u2013198.18 SQM / 1857\u20132133 SQFT","price_label":"Rs.2.23 Cr Onwards","price_inr":22300000.0},{"pid":"BRG_ALTIUS_CHN","label":"4 BR+4T+Maid","br":4,"carpet":"144.79\u2013148.45 SQM","sba":"236.43\u2013239.44 SQM / 2545\u20132577 SQFT","price_label":"Rs.3.02 Cr Onwards","price_inr":30200000.0},{"pid":"BRG_MORGAN_CHN","label":"2 BR+2T","br":2,"carpet":"72.58 SQM","sba":"116.21 SQM / 1251 SQFT","price_label":"Rs.1.07 Cr Onwards","price_inr":10700000.0},{"pid":"BRG_MORGAN_CHN","label":"3 BR+2T","br":3,"carpet":"84.64 SQM","sba":"133.72 SQM / 1439 SQFT","price_label":"Rs.1.25 Cr Onwards","price_inr":12500000.0},{"pid":"BRG_MORGAN_CHN","label":"3 BR+3T","br":3,"carpet":"94.36 SQM","sba":"150.21 SQM / 1617 SQFT","price_label":"Rs.1.42 Cr Onwards","price_inr":14200000.0},{"pid":"BRG_MORGAN_CHN","label":"3 BR+3T+Maid","br":3,"carpet":"111.31 SQM","sba":"175.51 SQM / 1889 SQFT","price_label":"Rs.1.65 Cr Onwards","price_inr":16500000.0},{"pid":"BRG_MORGAN_CHN","label":"4 BR+4T+Maid","br":4,"carpet":"146.73 SQM","sba":"235.27 SQM / 2532 SQFT","price_label":"Rs.2.27 Cr Onwards","price_inr":22700000.0},{"pid":"BRG_ICON_CHN","label":"3 BR+3T+Study","br":3,"carpet":"160.12 SQM","sba":"160.12 SQM / 2780 SQFT","price_label":"Rs.7.48 Cr Onwards","price_inr":74800000.0},{"pid":"BRG_ICON_CHN","label":"4 BR+4T","br":4,"carpet":"188.71 SQM","sba":"301.76 SQM / 3248 SQFT","price_label":"Rs.10.01 Cr Onwards","price_inr":100100000.0},{"pid":"BRG_ICON_CHN","label":"5 BR+5T+Study","br":5,"carpet":"305.9 SQM","sba":"490.33 SQM / 5278 SQFT","price_label":"Rs.21.04 Cr Onwards","price_inr":210400000.0},{"pid":"BRG_MANOR_HYD","label":"3 BR+3T","br":3,"carpet":"120.4\u2013144.66 SQM","sba":"192.01\u2013227.34 SQM / 2067\u20132447 SQFT","price_label":"Rs.2.13 Cr Onwards","price_inr":21300000.0},{"pid":"BRG_MANOR_HYD","label":"4 BR+4T","br":4,"carpet":"150.12\u2013179.6 SQM","sba":"244.82\u2013293.91 SQM / 2635\u20133164 SQFT","price_label":"Rs.2.80 Cr Onwards","price_inr":28000000.0},{"pid":"BRG_LUMINA_BLR","label":"2 BR+2T","br":2,"carpet":"66.27\u201370.24 SQM","sba":"102.08\u2013106.97 SQM / 1099\u20131151 SQFT","price_label":"Rs.1.22 Cr Onwards","price_inr":12200000.0},{"pid":"BRG_LUMINA_BLR","label":"3 BR+2T","br":3,"carpet":"87.27\u201393.87 SQM","sba":"134.17\u2013141.52 SQM / 1444\u20131523 SQFT","price_label":"Rs.1.60 Cr Onwards","price_inr":16000000.0},{"pid":"BRG_LUMINA_BLR","label":"3 BR+3T","br":3,"carpet":"103.74\u2013105.83 SQM","sba":"165.09\u2013169.0 SQM / 1777\u20131819 SQFT","price_label":"Rs.1.86 Cr Onwards","price_inr":18600000.0},{"pid":"BRG_BELVEDERE_BLR","label":"1 BR+1T","br":1,"carpet":"39.63\u201340.82 SQM","sba":"66.4\u201367.96 SQM / 715\u2013732 SQFT","price_label":"Rs.79 L Onwards","price_inr":7900000.0},{"pid":"BRG_BELVEDERE_BLR","label":"2 BR+2T","br":2,"carpet":"63.05\u201370.03 SQM","sba":"103.19\u2013113.97 SQM / 1111\u20131227 SQFT","price_label":"Rs.1.18 Cr Onwards","price_inr":11800000.0},{"pid":"BRG_BELVEDERE_BLR","label":"3 BR+2T","br":3,"carpet":"80.06\u201384.42 SQM","sba":"126.81\u2013134.01 SQM / 1365\u20131442 SQFT","price_label":"Rs.1.38 Cr Onwards","price_inr":13800000.0},{"pid":"BRG_BELVEDERE_BLR","label":"3 BR+3T","br":3,"carpet":"97.98\u201399.78 SQM","sba":"159.78\u2013164.14 SQM / 1720\u20131767 SQFT","price_label":"Rs.1.77 Cr Onwards","price_inr":17700000.0},{"pid":"BRG_BELVEDERE_BLR","label":"3 BR+3T+S+P","br":3,"carpet":"111.97 SQM","sba":"186.97 SQM / 2013 SQFT","price_label":"Rs.2.13 Cr Onwards","price_inr":21300000.0},{"pid":"BRG_ORCHARDS_MAPLE","label":"1 BR+1T","br":1,"carpet":"41.67\u201349.59 SQM","sba":"69.58\u201385.05 SQM / 749\u2013916 SQFT","price_label":"Rs.91 L Onwards","price_inr":9100000.0},{"pid":"BRG_ORCHARDS_MAPLE","label":"2 BR+2T","br":2,"carpet":"67.13\u201368.95 SQM","sba":"111.14\u2013113.7 SQM / 1196\u20131224 SQFT","price_label":"Rs.1.34 Cr Onwards","price_inr":13400000.0},{"pid":"BRG_ORCHARDS_MAPLE","label":"3 BR+2T","br":3,"carpet":"83.73\u201390.31 SQM","sba":"140.29\u2013143.99 SQM / 1510\u20131550 SQFT","price_label":"Rs.1.60 Cr Onwards","price_inr":16000000.0},{"pid":"BRG_ORCHARDS_MAPLE","label":"3 BR+3T","br":3,"carpet":"97.66 SQM","sba":"153.05 SQM / 1647 SQFT","price_label":"Rs.1.75 Cr Onwards","price_inr":17500000.0},{"pid":"BRG_ORCHARDS_LAUREL","label":"1 BR+1T+P","br":1,"carpet":"47.46 SQM","sba":"83.84 SQM / 902 SQFT","price_label":"Rs.1.09 Cr Onwards","price_inr":10900000.0},{"pid":"BRG_ORCHARDS_LAUREL","label":"1 BR+2T","br":1,"carpet":"64.62 SQM","sba":"111.84 SQM / 1204 SQFT","price_label":"Rs.1.30 Cr Onwards","price_inr":13000000.0},{"pid":"BRG_ORCHARDS_LAUREL","label":"2 BR+2T","br":2,"carpet":"76.44\u201379.04 SQM","sba":"129.83\u2013135.75 SQM / 1397\u20131461 SQFT","price_label":"Rs.1.52 Cr Onwards","price_inr":15200000.0},{"pid":"BRG_STELLARIS_CHN","label":"3 BR+3T","br":3,"carpet":"118.61\u2013119.43 SQM","sba":"188.84\u2013196.62 SQM / 2033\u20132116 SQFT","price_label":"Rs.4.11 Cr Onwards","price_inr":41100000.0},{"pid":"BRG_STELLARIS_CHN","label":"4 BR+4T+M","br":4,"carpet":"192.59\u2013200.38 SQM","sba":"297.31\u2013323.7 SQM / 3200\u20133484 SQFT","price_label":"Rs.6.72 Cr Onwards","price_inr":67200000.0},{"pid":"BRG_STELLARIS_CHN","label":"5 BR+5T+F","br":5,"carpet":"369.23\u2013381.59 SQM","sba":"571.81\u2013588.76 SQM / 6155\u20136337 SQFT","price_label":"Rs.14.50 Cr Onwards","price_inr":145000000.0}]};
+
+const CONTENT={};
+
+var TICKER_ITEMS = [
+  '<strong>🔴 NEW LAUNCH</strong> — Brigade Lumina · Tumkur Road, West Bangalore · 2 & 3 BHK from ₹1.22 Cr',
+  '<strong>🔴 NEW LAUNCH</strong> — Brigade Belvedere Ph1 · Budigere Cross, East Bangalore · 1 BHK from ₹79 L',
+  '<strong>🔴 NEW LAUNCH</strong> — Brigade Stellaris · Velachery, Chennai · Luxury 3, 4 & 5 BHK from ₹4.11 Cr',
+  '<strong>🔴 NEW LAUNCH</strong> — Brigade Orchards Maple & Laurel · Devanahalli · 1 BHK from ₹91 L',
+  '<strong>Brigade Avalon</strong> · Whitefield · Only 206 homes on 4 acres · Low density luxury · 3 BHK from ₹4.82 Cr',
+  '<strong>Brigade Gateway Hyd</strong> · Kokapet · G+57 iconic tower · Ultra luxury 3 to 5 BHK from ₹5.9 Cr',
+  '<strong>Brigade Orchards</strong> · Devanahalli · 135 Acres Integrated Township · 7 mins from Airport',
+  '<strong>Brigade Icon</strong> · Mount Road Chennai · Ultra Luxury G+38 · Only 200 homes · 3 BHK from ₹7.48 Cr',
+  '<strong>Brigade Insignia</strong> · Yelahanka · Luxury 3 to 5 BHK · Homes up to 4,137 sqft · From ₹2.45 Cr',
+  '<strong>Brigade Lakecrest</strong> · KR Puram · Studio to 3 BHK · Metro corridor · Starts ₹60 L',
+  '<strong>Brigade Citrine</strong> · Bidarahalli · All-Inclusive Pricing · 3 BHK at ₹2.07 Cr — zero hidden charges',
+  '<strong>Brigade Eternia</strong> · Yelahanka · 1,124 homes · 14 acres · 1 BHK ₹98 L · 4 BHK ₹4.05 Cr',
+  '<strong>Brigade Altius</strong> · Sholinganallur OMR Chennai · G+43 tower · 3 BHK from ₹1.89 Cr',
+  '<strong>Brigade Valencia Brillio</strong> · Near Electronic City · South Bangalore best value · 3 BHK from ₹1.30 Cr',
+  '<strong>Brigade Manor</strong> · Motinagar Hyderabad · Boutique 190 homes · Low-rise luxury · 3 BHK from ₹2.13 Cr',
+  '<strong>Brigade Morgan Heights</strong> · Medavakkam Chennai · 2 BHK from ₹1.07 Cr · 4 BHK from ₹2.27 Cr',
+  '<strong>Price Update</strong> — Brigade Lakecrest · Apr 2026 · Studio ₹60 L · 1 BHK ₹92 L · 3 BHK ₹1.95 Cr'
+];
+
+
+function getZone(micro,city,zone){
+  if(zone){var z=zone.toLowerCase();if(z.includes('north'))return'north';if(z.includes('south'))return'south';if(z.includes('east'))return'east';if(z.includes('west'))return'west';if(z.includes('blr')||z.includes('bengaluru'))return'blr';}
+  var m=(micro||'').toLowerCase();
+  if(city==='Bengaluru'){
+    if(['devanahalli','yelahanka','hebbal','thanisandra','kogilu','jakkur'].some(function(z){return m.includes(z)}))return'north';
+    if(['whitefield','kr puram','bidarahalli','malur','budigere','varthur','sarjapur','marathahalli'].some(function(z){return m.includes(z)}))return'east';
+    if(['hosur','electronic city','bannerghatta','jp nagar','btm'].some(function(z){return m.includes(z)}))return'south';
+    if(['tumkur','rajajinagar','yeshwanthpur','jalahalli','peenya'].some(function(z){return m.includes(z)}))return'west';
+    return'blr';
+  }
+  return'';
+}
+
+function parseProjects(rows){
+  var h=rows[0].map(function(x){return(x||'').toString().trim();});
+  function idx(k){return h.findIndex(function(v){return v.toLowerCase().includes(k.toLowerCase());});}
+  var iID=idx('Project_ID'),iName=idx('Project_Name'),iCity=idx('City'),iMicro=idx('Micro_Market'),
+      iStatus=idx('Status'),iRera=idx('RERA_No'),iPoss=idx('Possession_Date'),
+      iAcres=idx('Total_Acres'),iUnits=idx('Total_Units'),iFloors=idx('Floors'),iZone=idx('Zone'),
+      iOff=idx('Offers_URL'),iBro=idx('Brochure_URL'),iMap=idx('Maps_URL'),iAdm=idx('Admin_Remarks'),
+      iWa=idx('Whatsapp_Message');
+  return rows.slice(1).filter(function(r){return r[iID];}).map(function(r){
+    return{id:r[iID]||'',name:r[iName]||'',city:r[iCity]||'',micro:r[iMicro]||'',
+      status:r[iStatus]||'',rera:r[iRera]||'',possession:r[iPoss]||'',
+      acres:r[iAcres]||'',units:r[iUnits]||'',floors:r[iFloors]||'',
+      zone:getZone(r[iMicro],r[iCity],iZone>=0?r[iZone]:''),
+      offers_url:iOff>=0?(r[iOff]||''):'',brochure_url:iBro>=0?(r[iBro]||''):'',
+      maps_url:iMap>=0?(r[iMap]||''):'',admin_remarks:iAdm>=0?(r[iAdm]||''):'',
+      whatsapp_message:iWa>=0?(r[iWa]||''):''};
+  });
+}
+
+function parseUnits(rows){
+  var h=rows[0].map(function(x){return(x||'').toString().trim();});
+  function idx(k){return h.findIndex(function(v){return v.toLowerCase().includes(k.toLowerCase());});}
+  var iPID=idx('Project_ID'),iLabel=idx('Unit_Label'),iBR=idx('Bedrooms'),
+      iCMin=idx('Carpet_Min'),iCMax=idx('Carpet_Max'),
+      iSMin=idx('SBA_Min_SQM'),iSMax=idx('SBA_Max_SQM'),
+      iSFMin=idx('SBA_Min_SQFT'),iSFMax=idx('SBA_Max_SQFT'),
+      iPL=idx('Starting_Price_Label'),iPI=idx('Starting_Price_INR');
+  return rows.slice(1).filter(function(r){return r[iPID];}).map(function(r){
+    var cm=parseFloat(r[iCMin])||0,cx=parseFloat(r[iCMax])||0;
+    var sm=parseFloat(r[iSMin])||0,sx=parseFloat(r[iSMax])||0;
+    var fm=parseFloat(r[iSFMin])||0,fx=parseFloat(r[iSFMax])||0;
+    var carpet=cm===cx?cm+' SQM':cm+'\u2013'+cx+' SQM';
+    var sba=sm===sx?sm+' SQM / '+Math.round(fm).toLocaleString()+' SQFT':sm+'\u2013'+sx+' SQM / '+Math.round(fm).toLocaleString()+'\u2013'+Math.round(fx).toLocaleString()+' SQFT';
+    return{pid:r[iPID]||'',label:r[iLabel]||'',br:parseInt(r[iBR])||0,
+      carpet:carpet,sba:sba,price_label:r[iPL]||'On Request',price_inr:parseFloat(r[iPI])||0};
+  });
+}
+
+function parseContent(rows){
+  if(!rows||rows.length<2)return{};
+  var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});
+  function idx(k){return h.findIndex(function(v){return v.includes(k.toLowerCase().replace(/[_ ]/g,''));});}
+  var iID=idx('projectid'),iU1=idx('usplocation'),iU2=idx('uspproduct'),iU3=idx('uspdifferentiator'),
+      iAm=idx('amenities'),iOpen=idx('scriptopening'),iP1=idx('scriptpoint1'),iP2=idx('scriptpoint2'),
+      iP3=idx('scriptpoint3'),iP4=idx('scriptpoint4'),iClose=idx('scriptclosing');
+  var map={};
+  rows.slice(1).filter(function(r){return r[iID];}).forEach(function(r){
+    map[r[iID]]={u1:iU1>=0?r[iU1]||'':'',u2:iU2>=0?r[iU2]||'':'',u3:iU3>=0?r[iU3]||'':'',
+      amenities:iAm>=0?r[iAm]||'':'',script_open:iOpen>=0?r[iOpen]||'':'',
+      script_bullets:[iP1,iP2,iP3,iP4].map(function(i){return i>=0?r[i]||'':'';}).filter(Boolean),
+      script_close:iClose>=0?r[iClose]||'':''};
+  });
+  return map;
+}
+
+function parseIntel(rows){
+  if(!rows||rows.length<2)return{};
+  var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase().replace(/[_ ]/g,'');});
+  function idx(k){return h.findIndex(function(v){return v.includes(k);});}
+  var iID=idx('projectid'),iY=idx('rentalyield'),iR=idx('monthlyrental'),iA=idx('capitalappreciation'),
+      iO=idx('fiveyear'),iP=idx('pricepersqft'),iD=idx('demanddriver'),iRk=idx('riskfactor'),
+      iB=idx('bestfor'),iS=idx('datasource'),iU=idx('lastupdated');
+  var map={};
+  rows.slice(1).filter(function(r){return r[iID];}).forEach(function(r){
+    map[r[iID]]={yield_range:iY>=0?r[iY]||'':'',monthly_rental:iR>=0?r[iR]||'':'',
+      appreciation_yoy:iA>=0?r[iA]||'':'',outlook:iO>=0?r[iO]||'':'',
+      psf:iP>=0?r[iP]||'':'',demand_drivers:iD>=0?r[iD]||'':'',
+      risk_factors:iRk>=0?r[iRk]||'':'',best_for:iB>=0?r[iB]||'':'',
+      sources:iS>=0?r[iS]||'':'',updated:iU>=0?r[iU]||'':''};
+  });
+  return map;
+}
+
+function parseNotifs(rows){
+  if(!rows||rows.length<2)return[];
+  var h=rows[0].map(function(x){return(x||'').toString().trim().toLowerCase();});
+  var iD=h.indexOf('date'),iT=h.indexOf('title'),iM=h.indexOf('message'),iY=h.indexOf('type');
+  return rows.slice(1).filter(function(r){return r[iT]||r[iM];}).map(function(r,i){
+    return{id:'n'+(iD>=0?r[iD]:'')+i,date:iD>=0?r[iD]||'':'',
+      title:iT>=0?r[iT]||'':'',message:iM>=0?r[iM]||'':'',
+      type:iY>=0?(r[iY]||'general').toLowerCase():'general'};
+  }).reverse();
+}
+
+function applyData(data,source){
+  try{
+    var projs=data.projects||[],unts=data.units||[];
+    if(!projs.length)return;
+    if(Array.isArray(projs[0])){
+      PROJECTS=parseProjects(projs);UNITS=parseUnits(unts);
+      window.SHEET_CONTENT=data.content?parseContent(data.content):{};
+      if(data.intel)INTEL_DATA=parseIntel(data.intel);
+      if(data.technical)TECH_DATA=parseTechnical(data.technical);
+      if(data.quality)QUALITY_DATA=parseQuality(data.quality);
+      if(data.objections)OBJECTION_DATA=parseObjections(data.objections);
+      if(data.esg)ESG_DATA=parseESG(data.esg);
+      if(data.title_status)TITLE_DATA=parseTitleStatus(data.title_status);
+      if(data.notifications){NOTIFICATIONS_DATA=parseNotifs(data.notifications);renderNotifications();}
+    }else{
+      PROJECTS=projs.map(function(p){return Object.assign({},p,{zone:getZone(p.micro,p.city,p.zone)});});
+      UNITS=unts;window.SHEET_CONTENT={};
+    }
+    renderProjects();
+    if(source==='live')console.log('Live data loaded');
+  }catch(e){
+    var g=document.getElementById('projGrid');
+    if(g)g.innerHTML='<div class="empty" style="color:#B91C1C">Error: '+e.message+'</div>';
+  }
+}
+
+function loadData(){
+  applyData(SNAPSHOT,'snapshot');
+  var old=document.getElementById('jsonp_script');if(old)old.remove();
+  window._jsonpCallback=function(data){clearTimeout(window._jsonpTimeout);applyData(data,'live');};
+  window._jsonpTimeout=setTimeout(function(){console.log('Sheet unreachable');},10000);
+  var s=document.createElement('script');s.id='jsonp_script';
+  s.src=API_URL+'?callback=_jsonpCallback';
+  s.onerror=function(){clearTimeout(window._jsonpTimeout);};
+  document.head.appendChild(s);
+}
+
+function pickChip(el,g){
+  var v=el.dataset.v,ac='sel-'+g;
+  document.querySelectorAll('.chip[data-g="'+g+'"]').forEach(function(c){c.classList.remove(ac);});
+  if(el.classList.contains(ac)&&v!=='all'&&v!==''){
+    var allC=document.querySelector('.chip[data-g="'+g+'"][data-v="all"]')||document.querySelector('.chip[data-g="'+g+'"][data-v=""]');
+    if(allC)allC.classList.add(ac);F[g]=g==='loc'?'all':'';
+  }else{el.classList.add(ac);F[g]=v;}
+  updateFilterCount();renderProjects();
+}
+
+function clearAll(){
+  ['loc','budget','status','bhk'].forEach(function(g){
+    document.querySelectorAll('.chip[data-g="'+g+'"]').forEach(function(c){c.classList.remove('sel-'+g);});
+    var allC=document.querySelector('.chip[data-g="'+g+'"][data-v="all"]')||document.querySelector('.chip[data-g="'+g+'"][data-v=""]');
+    if(allC)allC.classList.add('sel-'+g);F[g]=g==='loc'?'all':'';
+  });
+  updateFilterCount();renderProjects();
+}
+
+function updateFilterCount(){
+  var c=0;if(F.budget)c++;if(F.status)c++;if(F.bhk)c++;
+  var el=document.getElementById('filterCount');
+  if(el){if(c>0){el.textContent=c;el.style.display='inline';}else{el.style.display='none';}}
+}
+
+function openDrawer(){var d=document.getElementById('filterDrawer'),o=document.getElementById('drawerOverlay');if(d)d.classList.add('on');if(o)o.classList.add('on');document.body.style.overflow='hidden';}
+function closeDrawer(){var d=document.getElementById('filterDrawer'),o=document.getElementById('drawerOverlay');if(d)d.classList.remove('on');if(o)o.classList.remove('on');document.body.style.overflow='';}
+
+function projectMatches(p){
+  if(F.loc&&F.loc!=='all'){
+    if(F.loc==='blr'){if(p.city!=='Bengaluru')return false;}
+    else if(['north','south','east','west'].indexOf(F.loc)>=0){if(p.zone!==F.loc)return false;}
+    else{if(p.city!==F.loc)return false;}
+  }
+  if(F.status&&p.status!==F.status)return false;
+  var units=UNITS.filter(function(u){return u.pid===p.id;});
+  if(F.budget||F.bhk){
+    var bhkN=F.bhk?parseInt(F.bhk):null;
+    function budgOk(u){
+      if(!F.budget)return true;if(!u.price_inr)return false;
+      if(F.budget==='lt1')return u.price_inr<10000000;
+      if(F.budget==='lt2')return u.price_inr<20000000;
+      if(F.budget==='lt4')return u.price_inr<40000000;
+      if(F.budget==='4plus')return u.price_inr>=40000000;
+      return true;
+    }
+    if(!units.some(function(u){return budgOk(u)&&(bhkN===null||u.br===bhkN);}))return false;
+  }
+  return true;
+}
+
+function renderProjects(){
+  var filtered=PROJECTS.filter(projectMatches).sort(function(a,b){
+    var co=(CITY_ORDER[a.city]||9)-(CITY_ORDER[b.city]||9);
+    return co!==0?co:a.name.localeCompare(b.name);
+  });
+  var ep=document.getElementById('s-proj');if(ep)ep.textContent=filtered.length;
+  var er=document.getElementById('s-rtm');if(er)er.textContent=filtered.filter(function(p){return p.status==='Ready to Move';}).length;
+  var eu=document.getElementById('s-uc');if(eu)eu.textContent=filtered.filter(function(p){return p.status==='Under Construction';}).length;
+  var ts=document.getElementById('topbarStats');if(ts)ts.style.display='flex';
+  var ri=document.getElementById('resultInfo');
+  if(ri)ri.innerHTML='Showing <strong>'+filtered.length+'</strong> project'+(filtered.length!==1?'s':'')+' &nbsp;·&nbsp; tap a card to explore';
+  var grid=document.getElementById('projGrid');
+  if(!filtered.length){if(grid)grid.innerHTML='<div class="empty">No projects match your filters.</div>';return;}
+  var html='';
+  filtered.forEach(function(p){
+    var units=UNITS.filter(function(u){return u.pid===p.id;});
+    var priced=units.filter(function(u){return u.price_inr>0;});
+    var minP=priced.length?Math.min.apply(null,priced.map(function(u){return u.price_inr;})):0;
+    var isRTM=p.status==='Ready to Move';
+    var bhkSet={};units.filter(function(u){return u.br>0;}).forEach(function(u){bhkSet[u.br]=1;});
+    var bhks=Object.keys(bhkSet).map(Number).sort();
+    var cfg=bhks.length?bhks.join(', ')+' BHK':'Studio';
+    var cc=p.city==='Bengaluru'?'city-blr':p.city==='Hyderabad'?'city-hyd':p.city==='Chennai'?'city-chn':'city-mys';
+    html+='<div class="proj-card '+cc+'" data-pid="'+p.id+'" onclick="openProject(this.dataset.pid)">';
+    html+='<div class="c-head">';
+    html+='<div class="c-name">'+p.name+'</div>';
+    html+='<div class="c-loc">📍 '+p.micro+', '+p.city+'</div>';
+    html+='<span class="c-status '+(isRTM?'s-rtm':'s-uc')+'">'+(isRTM?'RTMI':'UC')+'</span>';
+    html+='</div>';
+    html+='<div class="c-body"><div class="c-stats">';
+    html+='<div class="csc"><div class="csc-l">Acres</div><div class="csc-v">'+(p.acres||'—')+'</div></div>';
+    html+='<div class="csc"><div class="csc-l">Units</div><div class="csc-v">'+(p.units||'—')+'</div></div>';
+    html+='<div class="csc"><div class="csc-l">Floors</div><div class="csc-v">'+(p.floors||'—')+'</div></div>';
+    html+='<div class="csc"><div class="csc-l">Config</div><div class="csc-v" style="font-size:12px">'+cfg+'</div></div>';
+    html+='<div class="csc"><div class="csc-l">From</div><div class="csc-v">'+(minP?'\u20b9'+(minP/10000000).toFixed(2)+' Cr':'On Request')+'</div></div>';
+    html+='<div class="csc"><div class="csc-l">Possession</div><div class="csc-v">'+(p.possession||'Ready')+'</div></div>';
+    html+='</div></div>';
+    html+='<div class="c-footer"><span class="c-rera">'+(p.rera?'RERA: '+p.rera:'')+'</span>';
+    html+='<span class="c-view"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Explore</span></div>';
+    html+='</div>';
+  });
+  if(grid)grid.innerHTML=html;
+}
+
+function openProject(pid){
+  currentPID=pid;
+  var p=PROJECTS.find(function(x){return x.id===pid;});
+  if(!p)return;
+  var units=UNITS.filter(function(u){return u.pid===pid;});
+  var priced=units.filter(function(u){return u.price_inr>0;});
+  var minP=priced.length?Math.min.apply(null,priced.map(function(u){return u.price_inr;})):0;
+  var isRTM=p.status==='Ready to Move';
+  var c=(window.SHEET_CONTENT&&window.SHEET_CONTENT[pid])||CONTENT[pid]||{};
+
+  document.getElementById('mTitle').textContent=p.name;
+  document.getElementById('mSub').textContent='📍 '+p.micro+', '+p.city+(p.floors?' · '+p.floors+' floors':'')+(p.acres?' · '+p.acres+' acres':'');
+  document.getElementById('mBadges').innerHTML=
+    '<span class="c-status '+(isRTM?'s-rtm':'s-uc')+'" style="position:static">'+(isRTM?'RTMI':'UC')+'</span>'+
+    (minP?'<span class="m-price">\u20b9'+(minP/10000000).toFixed(2)+' Cr Onwards</span>':'');
+
+  // HELPERS
+  function wrapDetail(id,grp,html){
+    return '<div class="sub-detail" id="sub-'+id+'">'
+      +'<button class="back-btn" onclick="backToGroup(\''+grp+'\')" aria-label="Back">'
+      +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>'
+      +'<span>Back</span><kbd>Esc</kbd>'
+      +'</button>'
+      +html+'</div>';
+  }
+  function subCard(id,grp,icon,title,desc){
+    return '<div class="sub-card" onclick="openSubDetail(\''+grp+'\',\''+id+'\')">'+'<div class="sc-icon">'+icon+'</div><div class="sc-title">'+title+'</div><div class="sc-desc">'+desc+'</div><div class="sc-arrow">&rsaquo;</div></div>';
+  }
+  function groupPanel(label,purpose,cards,grp){
+    return '<div class="grp-label">'+label+'</div><div class="grp-purpose">'+purpose+'</div><div class="sub-grid">'+cards.map(function(c){return subCard(c[0],grp,c[1],c[2],c[3]);}).join('')+'</div>';
+  }
+
+  // PRODUCT
+  var prodHtml=(p.rera?'<p style="font-size:10px;color:var(--muted);margin-bottom:12px;font-family:monospace">RERA: '+p.rera+'</p>':'');
+  prodHtml+='<div style="overflow-x:auto"><table class="unit-tbl"><thead><tr><th>Unit Type</th><th>Carpet Area</th><th>SBA</th><th>Starting Price</th></tr></thead><tbody>';
+  units.forEach(function(u){prodHtml+='<tr><td class="u-label">'+u.label+'</td><td>'+u.carpet+'</td><td>'+u.sba+'</td><td class="u-price">'+u.price_label+'</td></tr>';});
+  prodHtml+='</tbody></table></div>';
+
+  var uspHtml='<div class="usp-grid">';
+  if(c.u1)uspHtml+='<div class="usp-card"><div class="usp-h">&#128205; Location</div><div class="usp-b">'+c.u1+'</div></div>';
+  if(c.u2)uspHtml+='<div class="usp-card"><div class="usp-h">&#127968; Product</div><div class="usp-b">'+c.u2+'</div></div>';
+  if(c.u3)uspHtml+='<div class="usp-card"><div class="usp-h">&#11088; Key Differentiator</div><div class="usp-b">'+c.u3+'</div></div>';
+  if(c.amenities)uspHtml+='<div class="usp-card"><div class="usp-h">&#127944; Amenities</div><div class="usp-b">'+c.amenities+'</div></div>';
+  if(!c.u1&&!c.u2&&!c.u3)uspHtml+='<p style="color:var(--muted);font-size:13px">USPs not available. Add to CONTENT tab in Google Sheet.</p>';
+  uspHtml+='</div>';
+
+  var scriptHtml='';
+  if(c.script_open){
+    scriptHtml='<div class="script-box"><div class="script-lbl">&#128172; Opening Line</div><div class="script-txt">&ldquo;'+c.script_open+'&rdquo;</div>';
+    if(c.script_bullets&&c.script_bullets.length){scriptHtml+='<div class="script-bullets">';c.script_bullets.forEach(function(b){scriptHtml+='<div class="script-bullet"><span class="script-bullet-dot">&rsaquo;</span><span>'+b+'</span></div>';});scriptHtml+='</div>';}
+    if(c.script_close)scriptHtml+='<div class="script-close-line">&ldquo;'+c.script_close+'&rdquo;</div>';
+    scriptHtml+='</div><div class="script-hint">&#128161; Open with the first line, pick 2&ndash;3 bullets matching customer need, close with the final line.</div>';
+  }else{scriptHtml='<p style="color:var(--muted);font-size:13px">Call script not available. Add to CONTENT tab in Google Sheet.</p>';}
+
+  var brochureHtml=p.brochure_url
+    ?'<div class="link-panel" style="background:var(--blue-bg)"><div class="lp-icon">&#128196;</div><div class="lp-title">Project Brochure</div><div class="lp-sub">Digital brochure for '+p.name+'.</div><a class="lp-btn" href="'+p.brochure_url+'" target="_blank">Open Brochure &#8599;</a></div>'
+    :'<div class="link-panel"><div class="lp-icon">&#128196;</div><div class="lp-title">Brochure</div><div class="lp-sub">No brochure link yet.</div><span class="lp-na">&mdash; Not available &mdash;</span></div>';
+
+  // INVESTMENT INTEL — Appreciation Outlook sub-detail
+  var intel=INTEL_DATA[pid]||{};
+  var intelHtml='';
+  if(intel.yield_range){
+    intelHtml='<div class="intel-grid">';
+    intelHtml+='<div class="intel-card gold-l"><div class="intel-h">Rental Yield</div><div class="intel-v">'+intel.yield_range+'</div>'+(intel.monthly_rental?'<div class="intel-sub">'+intel.monthly_rental+'</div>':'')+'</div>';
+    intelHtml+='<div class="intel-card green-l"><div class="intel-h">Capital Appreciation (YoY)</div><div class="intel-v" style="font-size:15px">'+intel.appreciation_yoy+'</div>'+(intel.psf?'<div class="intel-sub">Market: '+intel.psf+'</div>':'')+'</div>';
+    if(intel.outlook)intelHtml+='<div class="intel-card full blue-l"><div class="intel-h">5-Year Outlook</div><div class="intel-body">'+intel.outlook+'</div></div>';
+    if(intel.demand_drivers){var dT=intel.demand_drivers.split(';').map(function(d){return'<span class="intel-tag it-d">'+d.trim()+'</span>';}).join('');intelHtml+='<div class="intel-card full"><div class="intel-h">Demand Drivers</div><div class="intel-body">'+dT+'</div></div>';}
+    if(intel.risk_factors){var rT=intel.risk_factors.split(';').map(function(r){return'<span class="intel-tag it-r">'+r.trim()+'</span>';}).join('');intelHtml+='<div class="intel-card full"><div class="intel-h">Risk Factors</div><div class="intel-body">'+rT+'</div></div>';}
+    if(intel.best_for){var bT=intel.best_for.split(',').map(function(b){return'<span class="intel-tag it-b">'+b.trim()+'</span>';}).join('');intelHtml+='<div class="intel-card full"><div class="intel-h">Best For</div><div class="intel-body">'+bT+'</div></div>';}
+    if(intel.sources)intelHtml+='<div style="font-size:10px;color:#B0B8C8;margin-top:10px;grid-column:1/-1;border-top:1px solid var(--border);padding-top:8px">&#128202; '+intel.sources+(intel.updated?' &middot; Updated: '+intel.updated:'')+'</div>';
+    intelHtml+='</div>';
+  }else{intelHtml='<div style="padding:40px 20px;text-align:center;color:var(--muted)"><div style="font-size:32px;margin-bottom:10px">'+(Object.keys(INTEL_DATA).length===0?'&#9203;':'&#128200;')+'</div><p style="font-size:13px">'+(Object.keys(INTEL_DATA).length===0?'Loading from Google Sheet&hellip;':'No intel data for this project yet.')+'</p></div>';}
+
+  // LOCATION sub-detail
+  var mapUrl=p.maps_url||'';
+  var locationHtml='<div class="link-panel"><div class="lp-icon">&#128205;</div><div class="lp-title">'+p.name+'</div><div class="lp-sub">'+p.micro+', '+p.city+(p.acres?' &middot; '+p.acres+' acres':'')+(p.floors?' &middot; '+p.floors+' floors':'')+(p.units?' &middot; '+p.units+' units':'')+'</div>'+(mapUrl?'<a class="lp-btn" href="'+mapUrl+'" target="_blank">Open in Google Maps &#8599;</a>':'<span class="lp-na">Add Maps_URL in Google Sheet</span>')+'</div>';
+
+  // SALES REMARKS (top-level tab)
+  var sheetR=p.admin_remarks||'';
+  var localN=getRemarks(pid);
+  var remHtml='';
+  if(sheetR)remHtml+='<div style="background:#FFF8E8;border:1px solid var(--gold);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--navy);line-height:1.6"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:6px">&#128203; Team Remarks</div>'+sheetR+'</div>';
+  remHtml+='<p style="font-size:11px;color:var(--muted);margin-bottom:8px">Personal notes (saved on this device only):</p>';
+  remHtml+='<textarea class="remarks-ta" id="rmkTa" placeholder="Add your personal call notes here&hellip;">'+localN+'</textarea>';
+  remHtml+='<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><button class="save-btn" onclick="doSave()">Save Notes</button><span id="saveOk" style="font-size:11px;color:var(--green);display:none;font-weight:500">&#10003; Saved</span></div>';
+
+  // OBJECTIONS (top-level tab)
+  var obj=OBJECTION_DATA[pid]||{};
+  var objItems=[{q:'Price is too high',a:obj.price},{q:'Location is too far',a:obj.location},{q:'Worried about possession delay',a:obj.possession},{q:'Not sure about developer track record',a:obj.trust},{q:'Found better options nearby',a:obj.competition},{q:'Concerned about resale value',a:obj.resale},{q:'Nervous about buying under construction',a:obj.uc},{q:'Difficulty getting a loan',a:obj.loan}];
+  if(obj.custom1_q)objItems.push({q:obj.custom1_q,a:obj.custom1_a});
+  if(obj.custom2_q)objItems.push({q:obj.custom2_q,a:obj.custom2_a});
+  var objContent=objItems.filter(function(i){return i.a;}).map(function(item){return'<div style="margin-bottom:12px;border-radius:10px;overflow:hidden;border:1px solid var(--border)"><div style="background:var(--navy);padding:9px 13px;font-size:12px;font-weight:700;color:#fff">&#127919; '+item.q+'</div><div style="padding:11px 13px;font-size:13px;line-height:1.7;background:#FAFAFA">'+item.a+'</div></div>';}).join('');
+  if(!objContent)objContent='<p style="color:var(--muted);font-size:13px;padding:20px 0">Fill the Objections tab in the Excel template and upload to Google Sheet.</p>';
+
+  // TECHNICAL (top-level tab)
+  var tech=TECH_DATA[pid]||{};
+  function tRow(l,v){if(!v)return'';return'<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);flex:0 0 46%">'+l+'</span><span style="font-size:13px;font-weight:600;color:var(--navy);text-align:right">'+v+'</span></div>';}
+  function tSec(t,rows){var r=rows.join('');if(!r)return'';return'<div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:11px"><div style="background:var(--navy);padding:8px 13px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">'+t+'</div>'+r+'</div>';}
+  var techContent='';
+  if(Object.values(tech).some(function(v){return v;})){techContent+=tSec('Structure',[tRow('Type',tech.structure),tRow('Towers',tech.towers),tRow('Floors',tech.floors),tRow('Lifts/Tower',tech.lifts)]);techContent+=tSec('Services',[tRow('Power Backup',tech.power_backup+(tech.power_type?' &mdash; '+tech.power_type:'')),tRow('Water Source',tech.water),tRow('STP',tech.stp?tech.stp+' KLD':''),tRow('Parking',tech.parking_type),tRow('Parking Ratio',tech.parking_ratio)]);techContent+=tSec('Dimensions',[tRow('Ceiling',tech.ceiling?tech.ceiling+' ft':''),tRow('Floor-to-Floor',tech.f2f?tech.f2f+' ft':''),tRow('Club House',tech.clubhouse?tech.clubhouse+' sq.ft':''),tRow('Amenities',tech.amenities_count)]);techContent+=tSec('Safety',[tRow('Smart Home',tech.smart_home),tRow('Fire Safety',tech.fire),tRow('Security',tech.security)]);}
+  else{techContent='<p style="color:var(--muted);font-size:13px;padding:20px 0">Fill the Technical tab in the Excel template and upload to Google Sheet.</p>';}
+
+  // TRUST
+  var qual=QUALITY_DATA[pid]||{};
+  function qCard(icon,t,items){var rows=items.filter(function(i){return i[1];}).map(function(i){return'<div style="display:flex;justify-content:space-between;padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--muted);font-weight:500">'+i[0]+'</span><span style="color:var(--navy);font-weight:600;text-align:right;max-width:58%">'+i[1]+'</span></div>';}).join('');if(!rows)return'';return'<div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:11px"><div style="background:var(--navy);padding:8px 13px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">'+icon+' '+t+'</div>'+rows+'</div>';}
+  var qualContent='';
+  if(Object.values(qual).some(function(v){return v;})){if(qual.grade)qualContent+='<div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-bg);border:1px solid var(--blue);border-radius:8px;padding:7px 14px;margin-bottom:13px;font-size:12px;font-weight:700;color:var(--blue)">&#128142; Grade: '+qual.grade+'</div>';qualContent+=qCard('&#127968;','Flooring',[['Living Room',qual.living_floor],['Bedroom',qual.bed_floor],['Kitchen',qual.kitchen_floor]]);qualContent+=qCard('&#128703;','Bathroom',[['Fittings',qual.bath_fittings],['Sanitary',qual.sanitary]]);qualContent+=qCard('&#127859;','Kitchen',[['Platform',qual.kitchen_platform]]);qualContent+=qCard('&#128682;','Doors &amp; Windows',[['Main Door',qual.main_door],['Internal',qual.internal_doors],['Windows',qual.windows]]);qualContent+=qCard('&#9889;','Electrical',[['Brand',qual.electrical],['Interior Paint',qual.paint_int],['Exterior Paint',qual.paint_ext],['Lift Brand',qual.lift_brand]]);if(qual.premium1||qual.premium2)qualContent+='<div style="background:linear-gradient(135deg,var(--navy),#1a3460);border-radius:10px;padding:13px;margin-bottom:11px"><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px">&#10024; Premium Highlights</div>'+(qual.premium1?'<div style="color:#fff;font-size:13px;margin-bottom:5px">&bull; '+qual.premium1+'</div>':'')+(qual.premium2?'<div style="color:#fff;font-size:13px">&bull; '+qual.premium2+'</div>':'')+'</div>';}
+  else{qualContent='<p style="color:var(--muted);font-size:13px;padding:20px 0">Fill the Quality tab in the Excel template and upload to Google Sheet.</p>';}
+
+  var esg=ESG_DATA[pid]||{};
+  var esgContent='';
+  if(Object.values(esg).some(function(v){return v;})){var rc=esg.rating_level==='Platinum'?'#534AB7':esg.rating_level==='Gold'?'#C89B2A':esg.rating_level==='Silver'?'#6B7280':'#1D9E75';if(esg.rating&&esg.rating_level)esgContent+='<div style="display:inline-flex;align-items:center;gap:10px;padding:9px 16px;border-radius:10px;border:2px solid '+rc+';margin-bottom:15px"><span style="font-size:22px">&#127807;</span><div><div style="font-size:13px;font-weight:700;color:'+rc+'">'+esg.rating+' &mdash; '+esg.rating_level+'</div><div style="font-size:11px;color:var(--muted)">Green Building Certification</div></div></div>';var eF=[{i:'&#128167;',l:'Rainwater Harvesting',v:esg.rwh+(esg.rwh_cap?' ('+esg.rwh_cap+' KLD)':'')},{i:'&#9728;',l:'Solar Power',v:esg.solar?esg.solar+' KWp':''},{i:'&#128268;',l:'EV Charging',v:esg.ev},{i:'&#127795;',l:'Green Cover',v:esg.green_cover+(esg.trees?' | '+esg.trees+' trees':'')},{i:'&#9851;',l:'STP Water Reuse',v:esg.stp_reuse},{i:'&#128465;',l:'Waste Segregation',v:esg.waste}];esgContent+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:13px">';eF.filter(function(f){return f.v&&f.v!=='No';}).forEach(function(f){esgContent+='<div style="background:#E8F6EE;border:1px solid rgba(27,122,74,0.2);border-radius:9px;padding:11px"><div style="font-size:17px;margin-bottom:4px">'+f.i+'</div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#1D9E75;margin-bottom:2px">'+f.l+'</div><div style="font-size:12px;color:var(--text)">'+f.v+'</div></div>';});esgContent+='</div>';if(esg.social)esgContent+='<div style="background:var(--blue-bg);border-radius:9px;padding:11px 13px;font-size:13px">&#10084; '+esg.social+'</div>';}
+  else{esgContent='<p style="color:var(--muted);font-size:13px;padding:20px 0">Fill the ESG tab in the Excel template and upload to Google Sheet.</p>';}
+
+  var td=TITLE_DATA[pid]||{};
+  var titleContent='';
+  if(Object.values(td).some(function(v){return v;})){var sc={'GREEN - Clear':{bg:'#DCFCE7',bc:'#166534',tc:'#166534',icon:'&#9989;'},'YELLOW - Minor Issue':{bg:'#FEF9C3',bc:'#854F0B',tc:'#854F0B',icon:'&#9888;'},'RED - Significant Issue':{bg:'#FEE2E2',bc:'#B91C1C',tc:'#B91C1C',icon:'&#128680;'}}[td.status]||{bg:'#F3F4F6',bc:'#6B7280',tc:'#374151',icon:'&#128203;'};titleContent='<div style="background:'+sc.bg+';border:2px solid '+sc.bc+';border-radius:12px;padding:13px 16px;margin-bottom:15px;display:flex;align-items:center;gap:11px"><span style="font-size:26px">'+sc.icon+'</span><div><div style="font-size:14px;font-weight:700;color:'+sc.tc+'">'+td.status+'</div><div style="font-size:11px;color:var(--muted)">Title &amp; Legal Status</div></div></div>';function ttRow(l,v){if(!v)return'';return'<div style="display:flex;justify-content:space-between;padding:8px 13px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);flex:0 0 40%">'+l+'</span><span style="font-size:12px;font-weight:600;color:var(--navy);text-align:right">'+v+'</span></div>';}titleContent+='<div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:11px"><div style="background:var(--navy);padding:8px 13px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">Land &amp; Approvals</div>'+ttRow('Land Type',td.land_type)+ttRow('Conversion',td.conversion)+ttRow('Encumbrance',td.encumbrance)+ttRow('Litigation',td.litigation)+ttRow('RERA',td.rera)+ttRow('RERA No.',td.rera_no)+'</div>';titleContent+='<div style="background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;margin-bottom:11px"><div style="background:var(--navy);padding:8px 13px;font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">Banking</div>'+ttRow('Bank Approved',td.bank_approved)+ttRow('Approved Banks',td.banks)+ttRow('Title Insurance',td.insurance)+'</div>';if(td.issues&&td.issues!=='None')titleContent+='<div style="background:#FEF9C3;border:1px solid #854F0B;border-radius:9px;padding:11px 13px;margin-bottom:9px"><div style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;margin-bottom:3px">&#9888; Known Issues</div><div style="font-size:13px">'+td.issues+'</div>'+(td.resolution?'<div style="font-size:11px;color:var(--muted);margin-top:3px">Resolution: '+td.resolution+'</div>':'')+'</div>';}
+  else{titleContent='<p style="color:var(--muted);font-size:13px;padding:20px 0">Fill the Title Status tab in the Excel template and upload to Google Sheet.</p>';}
+
+  // ASSEMBLE — new structure: Product, Investment Intel, Technical, Objections, Trust, Sales Remarks
+  document.getElementById('grp-product').innerHTML=
+    groupPanel('PRODUCT','Start strong &mdash; pricing, strengths &amp; call script',[
+      ['pricing','&#128181;','Pricing','Unit types, sizes &amp; starting prices'],
+      ['usps','&#11088;','USPs','Key differentiators &amp; strengths'],
+      ['callscript','&#128172;','Call Script','Opening, talking points &amp; close'],
+      ['brochure','&#128196;','Brochure','Download project brochure']
+    ],'product')
+    +wrapDetail('pricing','product',prodHtml)
+    +wrapDetail('usps','product',uspHtml)
+    +wrapDetail('callscript','product',scriptHtml)
+    +wrapDetail('brochure','product',brochureHtml);
+
+  document.getElementById('grp-intel').innerHTML=
+    groupPanel('INVESTMENT INTEL','Appreciation outlook &amp; location context',[
+      ['outlook','&#128200;','Appreciation Outlook','Yield, YoY growth &amp; 5-year view'],
+      ['location','&#128205;','Location','Map &amp; micro-market context']
+    ],'intel')
+    +wrapDetail('outlook','intel',intelHtml)
+    +wrapDetail('location','intel',locationHtml);
+
+  // Technical — direct content (no sub-cards)
+  document.getElementById('grp-technical').innerHTML=
+    '<div class="grp-label">TECHNICAL</div>'
+    +'<div class="grp-purpose">Structure, services, dimensions &amp; safety specifications</div>'
+    +techContent;
+
+  // Objections — direct content (no sub-cards)
+  document.getElementById('grp-objections').innerHTML=
+    '<div class="grp-label">OBJECTIONS</div>'
+    +'<div class="grp-purpose">Common customer concerns with ready responses</div>'
+    +objContent;
+
+  document.getElementById('grp-trust').innerHTML=
+    groupPanel('TRUST','Remove fear &mdash; quality, sustainability &amp; legal clarity',[
+      ['quality','&#128142;','Quality','Fittings, flooring &amp; finish brands'],
+      ['esg','&#127807;','ESG','Green ratings &amp; sustainability'],
+      ['title','&#9878;','Title Status','Land, legal &amp; approvals']
+    ],'trust')
+    +wrapDetail('quality','trust',qualContent)
+    +wrapDetail('esg','trust',esgContent)
+    +wrapDetail('title','trust',titleContent);
+
+  // Sales Remarks — direct content (no sub-cards)
+  document.getElementById('grp-remarks').innerHTML=
+    '<div class="grp-label">SALES REMARKS</div>'
+    +'<div class="grp-purpose">Team notes from the sheet &amp; your personal call notes</div>'
+    +remHtml;
+
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(t){t.classList.remove('active');});
+  document.querySelector('.tab-btn').classList.add('active');
+  document.getElementById('grp-product').classList.add('active');
+  document.getElementById('modalOverlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+function switchGroup(name,btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.tab-panel').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('grp-'+name).classList.add('active');
+}
+function openSubDetail(grp,sub){
+  var panel=document.getElementById('grp-'+grp);
+  if(!panel)return;
+  panel.querySelectorAll('.sub-grid').forEach(function(g){g.style.display='none';});
+  panel.querySelectorAll('.grp-label,.grp-purpose').forEach(function(g){g.style.display='none';});
+  var det=document.getElementById('sub-'+sub);
+  if(det)det.classList.add('active');
+}
+function backToGroup(grp){
+  var panel=document.getElementById('grp-'+grp);
+  if(!panel)return;
+  panel.querySelectorAll('.sub-grid').forEach(function(g){g.style.display='';});
+  panel.querySelectorAll('.grp-label,.grp-purpose').forEach(function(g){g.style.display='';});
+  panel.querySelectorAll('.sub-detail').forEach(function(d){d.classList.remove('active');});
+}
+// Detect which group contains an active sub-detail (for keyboard back-nav)
+function findActiveSubDetailGroup(){
+  var active=document.querySelector('.tab-panel.active');
+  if(!active)return null;
+  if(!active.querySelector('.sub-detail.active'))return null;
+  return active.id.replace(/^grp-/,'');
+}
+// Keyboard shortcuts: Esc and Backspace step back one level
+// Backspace is ignored when focus is in an input/textarea/contenteditable so typing isn't hijacked
+document.addEventListener('keydown',function(e){
+  var modalOpen=document.getElementById('modalOverlay')&&document.getElementById('modalOverlay').classList.contains('on');
+  if(!modalOpen)return;
+  var tag=(e.target&&e.target.tagName||'').toLowerCase();
+  var isEditable=tag==='input'||tag==='textarea'||tag==='select'||(e.target&&e.target.isContentEditable);
+  if(e.key==='Escape'||(e.key==='Backspace'&&!isEditable)){
+    var grp=findActiveSubDetailGroup();
+    if(grp){
+      e.preventDefault();
+      backToGroup(grp);
+    }else if(e.key==='Escape'){
+      e.preventDefault();
+      closeModalDirect();
+    }
+  }
+});
+
+function doSave(){saveRemarks(currentPID,document.getElementById('rmkTa').value);var s=document.getElementById('saveOk');if(s){s.style.display='inline';setTimeout(function(){s.style.display='none';},2000);}}
+
+// ─────────────── TOAST ───────────────
+function showToast(msg,ms){
+  var t=document.getElementById('toast');if(!t)return;
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(window._toastTO);
+  window._toastTO=setTimeout(function(){t.classList.remove('on');},ms||2600);
+}
+
+// ─────────────── WHATSAPP SHARE ───────────────
+// Builds a fallback message from available data when the sheet's Whatsapp_Message cell is empty.
+// This is a simpler version of the Python generator we used to seed the sheet.
+function buildFallbackWhatsAppMessage(p,units){
+  var lines=[];
+  lines.push('🏡 *'+p.name+'*');
+  lines.push('📍 '+p.micro+', '+p.city);
+  lines.push('');
+
+  if(p.status==='Ready to Move'){lines.push('▸ Status: Ready to Move In');}
+  else{var s='▸ Status: '+p.status;if(p.possession)s+=' | Possession: '+p.possession;lines.push(s);}
+
+  var sizeBits=[];
+  if(p.acres)sizeBits.push(p.acres+' acres');
+  if(p.units)sizeBits.push(p.units+' units');
+  if(p.floors){
+    // "18" → "18 floors"; "G+14" → "G+14 tower"
+    var f=String(p.floors).trim();
+    sizeBits.push(/^\d+$/.test(f)?f+' floors':f+' tower');
+  }
+  if(sizeBits.length)lines.push('▸ '+sizeBits.join(' | '));
+  lines.push('');
+
+  var priced=(units||[]).filter(function(u){return u.price_inr>0;}).sort(function(a,b){return a.price_inr-b.price_inr;});
+  if(priced.length){
+    var min=priced[0].price_inr;
+    var startStr=min>=10000000?('₹'+(min/10000000).toFixed(2)+' Cr'):('₹'+Math.round(min/100000)+' L');
+    lines.push('💰 *Starting '+startStr+' onwards*');
+    priced.forEach(function(u){
+      var p_=u.price_inr>=10000000?('₹'+(u.price_inr/10000000).toFixed(2)+' Cr'):('₹'+Math.round(u.price_inr/100000)+' L');
+      lines.push('• '+u.label+' — '+p_);
+    });
+  }else if(units&&units.length){
+    lines.push('💰 *Pricing on Request*');
+    units.forEach(function(u){lines.push('• '+u.label+' — On Request');});
+  }
+  lines.push('');
+
+  if(p.maps_url)lines.push('📍 Location: '+p.maps_url);
+  if(p.brochure_url)lines.push('📄 Brochure: '+p.brochure_url);
+  lines.push('');
+  if(p.rera)lines.push('RERA: '+p.rera);
+  lines.push('');
+  lines.push('_Shared via Brigade Compass_');
+  return lines.join('\n');
+}
+
+// Detect mobile for choosing the right WhatsApp URL scheme
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|BlackBerry/i.test(navigator.userAgent||'');
+}
+
+// Normalise any "unsafe" emoji/characters that render inconsistently on older
+// WhatsApp clients. We leave common single-codepoint emoji (🏡 📍 💰 📄 etc.)
+// alone and only neutralise the compound 🏗️ (building-construction + VS16).
+function sanitiseForWhatsApp(msg){
+  if(!msg)return'';
+  // Replace compound 🏗️ (U+1F3D7 U+FE0F) and bare 🏗 (U+1F3D7) with a text prefix
+  msg=msg.replace(/\uD83C\uDFD7\uFE0F?/g,'▸');
+  return msg;
+}
+
+function shareOnWhatsApp(){
+  if(!currentPID){showToast('No project selected');return;}
+  var p=PROJECTS.find(function(x){return x.id===currentPID;});
+  if(!p){showToast('Project not found');return;}
+  var units=UNITS.filter(function(u){return u.pid===currentPID;});
+
+  // Prefer the sheet's Whatsapp_Message column; fall back to auto-generated text
+  var msg=(p.whatsapp_message||'').trim();
+  if(!msg)msg=buildFallbackWhatsAppMessage(p,units);
+  msg=sanitiseForWhatsApp(msg);
+
+  var encoded=encodeURIComponent(msg);
+
+  // Choose the right URL:
+  // - Mobile: wa.me deep-links directly into the WhatsApp app (no interstitial)
+  // - Desktop: web.whatsapp.com/send goes straight to the chat picker in
+  //   WhatsApp Web, skipping the "Open app / Continue to WhatsApp Web" page
+  //   that wa.me shows on desktop
+  var waUrl=isMobileDevice()
+    ? 'https://wa.me/?text='+encoded
+    : 'https://web.whatsapp.com/send?text='+encoded;
+
+  var win=window.open(waUrl,'_blank','noopener,noreferrer');
+  if(!win){
+    copyToClipboard(msg,function(ok){
+      showToast(ok?'Popup blocked. Message copied — paste into WhatsApp.':'Popup blocked. Could not copy either.',4000);
+    });
+    return;
+  }
+  showToast('Opening WhatsApp…');
+}
+
+function copyToClipboard(text,cb){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){cb&&cb(true);},function(){cb&&cb(false);});
+    return;
+  }
+  try{
+    var ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.top='-9999px';
+    document.body.appendChild(ta);ta.select();
+    var ok=document.execCommand('copy');
+    document.body.removeChild(ta);
+    cb&&cb(ok);
+  }catch(e){cb&&cb(false);}
+}
+
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalDirect();}
+function closeModalDirect(){document.getElementById('modalOverlay').classList.remove('on');document.body.style.overflow='';}
+function getRemarks(pid){try{return localStorage.getItem('rmk_'+pid)||'';}catch(e){return'';}}
+function saveRemarks(pid,v){try{localStorage.setItem('rmk_'+pid,v);}catch(e){}}
+
+function loadReadIds(){try{var s=localStorage.getItem('brigade_read_notifs');readNotifIds=s?new Set(JSON.parse(s)):new Set();}catch(e){readNotifIds=new Set();}}
+function saveReadIds(){try{var arr=[];readNotifIds.forEach(function(v){arr.push(v);});localStorage.setItem('brigade_read_notifs',JSON.stringify(arr));}catch(e){}}
+function renderNotifications(){
+  var badge=document.getElementById('notifBadge');loadReadIds();
+  var unread=NOTIFICATIONS_DATA.filter(function(n){return!readNotifIds.has(n.id);}).length;
+  if(badge){if(unread>0){badge.textContent=unread>9?'9+':unread;badge.classList.add('on');}else{badge.classList.remove('on');}}
+  var uc=document.getElementById('notifUnreadCount');if(uc)uc.textContent=unread>0?'('+unread+' new)':'';
+  var list=document.getElementById('notifList');if(!list)return;
+  if(!NOTIFICATIONS_DATA.length){list.innerHTML='<div style="padding:36px 20px;text-align:center;color:var(--muted)"><p style="font-size:13px">No notifications yet.</p></div>';return;}
+  var typeClass={launch:'nt-launch',price:'nt-price',general:'nt-general'};
+  var typeLabel={launch:'🔴 New Launch',price:'💰 Price Update',general:'📢 Update'};
+  var h='';
+  NOTIFICATIONS_DATA.forEach(function(n){
+    var isUnread=!readNotifIds.has(n.id);
+    h+='<div class="notif-item '+(isUnread?'unread':'')+'" data-nid="'+n.id+'" onclick="markRead(this.dataset.nid,this)">';
+    h+='<span class="notif-type-badge '+(typeClass[n.type]||'nt-general')+'">'+(typeLabel[n.type]||'📢 Update')+'</span>';
+    h+='<div class="notif-title">'+n.title+'</div><div class="notif-msg">'+n.message+'</div>';
+    if(n.date)h+='<div class="notif-date">'+n.date+'</div>';
+    h+='</div>';
+  });
+  list.innerHTML=h;
+}
+function toggleNotifPanel(){var p=document.getElementById('notifPanel'),o=document.getElementById('notifOverlay');if(p.style.display!=='none'){p.style.display='none';o.classList.remove('on');}else{p.style.display='flex';o.classList.add('on');renderNotifications();}}
+function closeNotifPanel(){document.getElementById('notifPanel').style.display='none';document.getElementById('notifOverlay').classList.remove('on');}
+function markRead(id,el){readNotifIds.add(id);saveReadIds();if(el)el.classList.remove('unread');renderNotifications();}
+function markAllRead(){NOTIFICATIONS_DATA.forEach(function(n){readNotifIds.add(n.id);});saveReadIds();renderNotifications();closeNotifPanel();}
+
+function initTicker(){
+  var inner=document.getElementById('tickerInner');if(!inner)return;
+  var sep='<span class="t-sep"></span>';
+  var items=TICKER_ITEMS.map(function(t){return'<span class="t-item"><span>'+t+'</span></span>'+sep;}).join('');
+  inner.innerHTML=items+items;
+  requestAnimationFrame(function(){
+    var hw=inner.scrollWidth/2;var dur=Math.max(50,hw/110);
+    var st=document.createElement('style');
+    st.textContent='@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-'+hw+'px)}}';
+    document.head.appendChild(st);
+    inner.style.animationDuration=dur+'s';
+  });
+}
+
+function openPin(){if(adminActive)return;document.getElementById('pinInput').value='';document.getElementById('pinErr').style.display='none';document.getElementById('pinOv').classList.add('on');setTimeout(function(){document.getElementById('pinInput').focus();},80);}
+function closePinModal(){document.getElementById('pinOv').classList.remove('on');}
+function checkPin(){if(document.getElementById('pinInput').value.trim()===ADMIN_PIN){adminActive=true;closePinModal();document.getElementById('adminBar').classList.add('on');}else{document.getElementById('pinErr').style.display='block';document.getElementById('pinInput').value='';}}
+function logoutAdmin(){adminActive=false;document.getElementById('adminBar').classList.remove('on');}
+
+// Admin accessible via URL hash
+function checkAdminURL(){try{if(window.location&&window.location.hash==='#admin')openPin();}catch(e){}}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var logoSrc=document.getElementById('logoData').src;
+  document.querySelectorAll('.brand img,.splash img').forEach(function(img){img.src=logoSrc;});
+  setTimeout(function(){var s=document.getElementById('splash');if(s){s.classList.add('hide');setTimeout(function(){s.remove();},600);}},2100);
+  initTicker();
+  loadData();
+  checkAdminURL();
+});
+</script>
+</body>
+</html>
